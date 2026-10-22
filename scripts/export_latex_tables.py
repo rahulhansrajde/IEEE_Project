@@ -158,12 +158,10 @@ def make_table2(summary: pd.DataFrame) -> str:
     ref = df.loc[df["model"] == ABLATION_MODELS[0], "macro_f1"]
     ref_f1 = float(ref.iloc[0]) if len(ref) else np.nan
     cols = [
-        ("accuracy", "{:.2f}", True),
         ("balanced_accuracy", "{:.2f}", True),
         ("macro_f1", "{:.2f}", True),
         ("auroc", "{:.2f}", True),
         ("ece", "{:.2f}", False),
-        ("params_m", "{:.3f}", False),
         ("head_params_k", "{:.1f}", False),
     ]
     formatted = {c: rank_format(df[c].to_numpy(dtype=float), f, hib) for c, f, hib in cols}
@@ -177,13 +175,13 @@ def make_table2(summary: pd.DataFrame) -> str:
         r"reduce to the symbolic form $w_b\,\mathrm{SiLU}(x)$; $H$: normalised entropy of the spline edge "
         r"importances (lower = more concentrated).}",
         r"\label{tab:ablation}",
-        r"\setlength{\tabcolsep}{2.4pt}",
+        r"\setlength{\tabcolsep}{2.2pt}",
         r"\resizebox{\columnwidth}{!}{%",
-        r"\begin{tabular}{cccc ccccc cc cc c}",
+        r"\begin{tabular}{cccc cccc c cc c}",
         r"\toprule",
         r"\rotatebox{90}{KANConv} & \rotatebox{90}{Attention} & \rotatebox{90}{KAN head} & "
-        r"\rotatebox{90}{Spline reg.} & Acc. & B-Acc. & Macro-F1 & AUROC & ECE$\downarrow$ & "
-        r"Params (M) & Head (K) & Symb. (\%) & $H$ & $\Delta$F1 \\",
+        r"\rotatebox{90}{Spline reg.} & B-Acc. & Macro-F1 & AUROC & ECE$\downarrow$ & "
+        r"Head (K) & Symb. (\%) & $H$ & $\Delta$F1 \\",
         r"\midrule",
     ]
     for i, row in df.iterrows():
@@ -252,6 +250,12 @@ def make_macros(summary: pd.DataFrame, per_class: Optional[pd.DataFrame] = None,
                 continue
             s = fmt.get(col, "{:.2f}").format(float(val))
             lines.append(rf"\expandafter\def\csname res@{row['model']}@{col}\endcsname{{{s}}}")
+    for _, row in summary.iterrows():
+        if "kan_edge_sparsity" in row and not pd.isna(row["kan_edge_sparsity"]):
+            lines.append(rf"\expandafter\def\csname res@{row['model']}@kan_edge_sparsity_pct\endcsname"
+                         rf"{{{100 * row['kan_edge_sparsity']:.2f}}}")
+            lines.append(rf"\expandafter\def\csname res@{row['model']}@kan_head_edges_k\endcsname"
+                         rf"{{{row['kan_head_edges'] / 1000:.1f}}}")
     # Derived quantities quoted in the manuscript.
     idx = summary.set_index("model")
     if PROPOSED_MODEL in idx.index:
@@ -261,6 +265,12 @@ def make_macros(summary: pd.DataFrame, per_class: Optional[pd.DataFrame] = None,
             ref = idx.loc[ABLATION_MODELS[0]]
             derived["head_reduction_pct"] = 100 * (1 - prop["head_params_k"] / ref["head_params_k"])
             derived["f1_gain_over_mlp"] = prop["macro_f1"] - ref["macro_f1"]
+        if ABLATION_MODELS[3] in idx.index:
+            derived["reg_cost_f1"] = idx.loc[ABLATION_MODELS[3], "macro_f1"] - prop["macro_f1"]
+        if paired is not None and len(paired):
+            abl = paired[paired["model"].isin(ABLATION_MODELS)]
+            if len(abl):
+                derived["min_ablation_p"] = float(abl["p_value"].min())
         base = [m for m in BASELINE_MODELS if m in idx.index]
         if base:
             best = max(base, key=lambda m: idx.loc[m, "macro_f1"])

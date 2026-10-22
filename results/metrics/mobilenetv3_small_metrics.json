@@ -1,0 +1,169 @@
+{
+  "accuracy": 77.45635910224439,
+  "balanced_accuracy": 67.69558690697306,
+  "macro_f1": 62.26551783930514,
+  "weighted_f1": 77.73717109680422,
+  "macro_precision": 58.79070424485151,
+  "macro_recall": 67.69558690697306,
+  "macro_specificity": 94.90653265704887,
+  "auroc": 94.04750056772286,
+  "cohen_kappa": 0.5821439456149919,
+  "ece": 18.189521620695725,
+  "n_test": 2005,
+  "macro_f1_ci_lower": 58.5499384828498,
+  "macro_f1_ci_upper": 65.63605559739891,
+  "macro_f1_ci_std": 1.8757243659499285,
+  "accuracy_ci_lower": 75.66084788029926,
+  "accuracy_ci_upper": 79.30174563591022,
+  "accuracy_ci_std": 0.9370863607186795,
+  "auroc_ci_lower": 93.19654727640739,
+  "auroc_ci_upper": 94.77747698209333,
+  "auroc_ci_std": 0.3910406296594399,
+  "conformal_alpha": 0.1,
+  "conformal_qhat": 0.7738423943519592,
+  "conformal_coverage": 89.67581047381546,
+  "conformal_set_size": 1.485286783042394,
+  "per_class": [
+    {
+      "class": "akiec",
+      "precision": 40.38461538461539,
+      "recall": 63.63636363636363,
+      "f1": 49.411764705882355,
+      "specificity": 96.80247550283651,
+      "auroc": 96.33519308609561,
+      "support": 66
+    },
+    {
+      "class": "bcc",
+      "precision": 54.347826086956516,
+      "recall": 72.81553398058253,
+      "f1": 62.24066390041494,
+      "specificity": 96.68769716088327,
+      "auroc": 97.08686819188794,
+      "support": 103
+    },
+    {
+      "class": "bkl",
+      "precision": 55.172413793103445,
+      "recall": 50.90909090909091,
+      "f1": 52.95508274231678,
+      "specificity": 94.90196078431372,
+      "auroc": 89.23427552839318,
+      "support": 220
+    },
+    {
+      "class": "df",
+      "precision": 38.23529411764706,
+      "recall": 56.52173913043478,
+      "f1": 45.614035087719294,
+      "specificity": 98.94046417759839,
+      "auroc": 96.08871144649673,
+      "support": 23
+    },
+    {
+      "class": "mel",
+      "precision": 52.331606217616574,
+      "recall": 45.2914798206278,
+      "f1": 48.55769230769231,
+      "specificity": 94.83726150392818,
+      "auroc": 86.679953496097,
+      "support": 223
+    },
+    {
+      "class": "nv",
+      "precision": 91.06317411402158,
+      "recall": 88.14317673378076,
+      "f1": 89.57938613111027,
+      "specificity": 82.53012048192771,
+      "auroc": 93.8027276892806,
+      "support": 1341
+    },
+    {
+      "class": "vasc",
+      "precision": 80.0,
+      "recall": 96.55172413793103,
+      "f1": 87.5,
+      "specificity": 99.64574898785426,
+      "auroc": 99.10477453580903,
+      "support": 29
+    }
+  ],
+  "confusion_matrix": [
+    [
+      42,
+      15,
+      6,
+      0,
+      3,
+      0,
+      0
+    ],
+    [
+      11,
+      75,
+      2,
+      7,
+      3,
+      3,
+      2
+    ],
+    [
+      28,
+      15,
+      112,
+      2,
+      23,
+      40,
+      0
+    ],
+    [
+      2,
+      3,
+      1,
+      13,
+      0,
+      4,
+      0
+    ],
+    [
+      12,
+      6,
+      27,
+      6,
+      101,
+      68,
+      3
+    ],
+    [
+      9,
+      24,
+      55,
+      6,
+      63,
+      1182,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      28
+    ]
+  ],
+  "model": "mobilenetv3_small",
+  "display_name": "MobileNetV3-S",
+  "family": "baseline",
+  "best_epoch": 10,
+  "epochs_run": 10,
+  "epochs_budget": 10,
+  "train_time_min": 13.095288320382435,
+  "best_val_macro_f1": 65.00710150098817,
+  "dataset": "dermamnist",
+  "image_size": 128,
+  "spline_regularization": false,
+  "lambda_l1": 0.0,
+  "lambda_ent": 0.0
+}

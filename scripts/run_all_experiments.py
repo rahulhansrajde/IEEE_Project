@@ -362,27 +362,31 @@ def make_gradcam_figure(cfg, bundle, dirs, device, best_baseline: Optional[str],
 
     set_ieee_style()
     n_cols = 4 if cams_b is not None else 3
-    fig, axes = plt.subplots(len(idx), n_cols, figsize=(7.16 * n_cols / 4, 1.85 * len(idx)), squeeze=False)
+    per_row = 2  # samples per figure row -> wide, short layout for a two-column page
+    n_rows = int(np.ceil(len(idx) / per_row))
+    fig, axes = plt.subplots(n_rows, per_row * n_cols, figsize=(7.16, 1.05 * n_rows + 0.25), squeeze=False)
     names = bundle.class_names
+    base_name = MODEL_SPECS[best_baseline].display_name if cams_b is not None else ""
     for r in range(len(idx)):
         img = denormalize(images[r].cpu()).permute(1, 2, 0).numpy()
         pred_p = int(probs_p[r].argmax())
-        mark = "correct" if pred_p == labels[r] else "error"
+        mark = "" if pred_p == labels[r] else " (error)"
         panels = [
-            (img, f"GT: {names[labels[r]]} | Pred: {names[pred_p]} ({100 * probs_p[r, pred_p]:.0f}%, {mark})"),
-            (overlay_heatmap(img, att[r], 0.5, "viridis"), "Att-ConvKAN coordinate-channel attention"),
-            (overlay_heatmap(img, cams_p[r]), "Att-ConvKAN Grad-CAM++"),
+            (img, f"GT {names[labels[r]]} / pred {names[pred_p]}{mark}"),
+            (overlay_heatmap(img, att[r], 0.5, "viridis"), "Ours: attention"),
+            (overlay_heatmap(img, cams_p[r]), "Ours: Grad-CAM++"),
         ]
         if cams_b is not None:
             pb = int(probs_b[r].argmax())
-            panels.append((overlay_heatmap(img, cams_b[r]),
-                           f"{MODEL_SPECS[best_baseline].display_name} Grad-CAM++ (pred: {names[pb]})"))
+            panels.append((overlay_heatmap(img, cams_b[r]), f"{base_name} (pred {names[pb]})"))
         for c, (im, title) in enumerate(panels):
-            ax = axes[r, c]
+            ax = axes[r // per_row, (r % per_row) * n_cols + c]
             ax.imshow(im)
-            ax.set_title(title, fontsize=6.2)
+            ax.set_title(title, fontsize=5.6, pad=2)
             ax.axis("off")
-    fig.tight_layout()
+    for ax in axes.flat[len(idx) * n_cols:]:
+        ax.axis("off")
+    fig.subplots_adjust(left=0.005, right=0.995, top=0.93, bottom=0.01, wspace=0.04, hspace=0.18)
     save_figure(fig, dirs["figures"], "fig1_gradcam_comparison")
     logger.info("  fig1 written (test indices %s)", idx)
 
