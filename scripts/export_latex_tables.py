@@ -279,6 +279,18 @@ def make_macros(summary: pd.DataFrame, per_class: Optional[pd.DataFrame] = None,
             derived["param_ratio_best_baseline"] = idx.loc[best, "params_m"] / prop["params_m"]
             derived["gflops_ratio_best_baseline"] = idx.loc[best, "gflops"] / prop["gflops"]
             lines.append(rf"\def\bestbaselinename{{{_latex_escape(MODEL_SPECS[best].display_name)}}}")
+            if paired is not None and best in set(paired["model"]):
+                p_best = float(paired.loc[paired["model"] == best, "p_value"].iloc[0])
+                p_str = "<0.001" if p_best < 0.001 else f"={p_best:.3f}"
+                lines.append(rf"\def\bestbaselinep{{{p_str}}}")
+            if per_class is not None and len(per_class):
+                mel = per_class[(per_class["model"] == best) & (per_class["class"] == "mel")]
+                if len(mel):
+                    derived["best_baseline_mel_recall"] = float(mel["recall"].iloc[0])
+            lighter = [m for m in base if m != "mobilenetv3_small"]
+            if lighter:
+                derived["min_heavy_params_m"] = float(idx.loc[lighter, "params_m"].min())
+                derived["max_heavy_params_m"] = float(idx.loc[lighter, "params_m"].max())
             heavy = idx.loc[base, "params_m"].idxmax()
             derived["param_ratio_largest_baseline"] = idx.loc[heavy, "params_m"] / prop["params_m"]
             lines.append(rf"\def\largestbaselinename{{{_latex_escape(MODEL_SPECS[heavy].display_name)}}}")

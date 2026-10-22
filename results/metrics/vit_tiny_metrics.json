@@ -1,0 +1,169 @@
+{
+  "accuracy": 83.0922693266833,
+  "balanced_accuracy": 79.26588853854282,
+  "macro_f1": 74.43378208910586,
+  "weighted_f1": 83.30958115811383,
+  "macro_precision": 70.8181073552065,
+  "macro_recall": 79.26588853854282,
+  "macro_specificity": 96.12290073004556,
+  "auroc": 96.54755103754809,
+  "cohen_kappa": 0.6852918584122425,
+  "ece": 21.311595890290125,
+  "n_test": 2005,
+  "macro_f1_ci_lower": 71.0775736077101,
+  "macro_f1_ci_upper": 77.50073444517542,
+  "macro_f1_ci_std": 1.6504966197833648,
+  "accuracy_ci_lower": 81.39650872817955,
+  "accuracy_ci_upper": 84.73815461346634,
+  "accuracy_ci_std": 0.8385277582989139,
+  "auroc_ci_lower": 96.06437876128753,
+  "auroc_ci_upper": 97.02077499896586,
+  "auroc_ci_std": 0.2491159047787998,
+  "conformal_alpha": 0.1,
+  "conformal_qhat": 0.7245057821273804,
+  "conformal_coverage": 90.67331670822942,
+  "conformal_set_size": 1.2778054862842894,
+  "per_class": [
+    {
+      "class": "akiec",
+      "precision": 55.952380952380956,
+      "recall": 71.21212121212122,
+      "f1": 62.66666666666667,
+      "specificity": 98.09179989685404,
+      "auroc": 97.84721896635253,
+      "support": 66
+    },
+    {
+      "class": "bcc",
+      "precision": 70.0,
+      "recall": 74.75728155339806,
+      "f1": 72.30046948356808,
+      "specificity": 98.26498422712933,
+      "auroc": 97.64529927618348,
+      "support": 103
+    },
+    {
+      "class": "bkl",
+      "precision": 66.51583710407239,
+      "recall": 66.81818181818183,
+      "f1": 66.66666666666666,
+      "specificity": 95.85434173669468,
+      "auroc": 93.64425770308124,
+      "support": 220
+    },
+    {
+      "class": "df",
+      "precision": 61.76470588235294,
+      "recall": 91.30434782608695,
+      "f1": 73.68421052631578,
+      "specificity": 99.34409687184662,
+      "auroc": 99.68850085552582,
+      "support": 23
+    },
+    {
+      "class": "mel",
+      "precision": 60.53811659192825,
+      "recall": 60.53811659192825,
+      "f1": 60.53811659192825,
+      "specificity": 95.06172839506173,
+      "auroc": 91.18036367662677,
+      "support": 223
+    },
+    {
+      "class": "nv",
+      "precision": 93.07692307692308,
+      "recall": 90.23117076808353,
+      "f1": 91.63195759182128,
+      "specificity": 86.44578313253012,
+      "auroc": 95.84815773159754,
+      "support": 1341
+    },
+    {
+      "class": "vasc",
+      "precision": 87.87878787878788,
+      "recall": 100.0,
+      "f1": 93.54838709677419,
+      "specificity": 99.79757085020243,
+      "auroc": 99.97905905346923,
+      "support": 29
+    }
+  ],
+  "confusion_matrix": [
+    [
+      47,
+      11,
+      4,
+      0,
+      3,
+      1,
+      0
+    ],
+    [
+      5,
+      77,
+      5,
+      7,
+      5,
+      4,
+      0
+    ],
+    [
+      16,
+      8,
+      147,
+      0,
+      20,
+      29,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      21,
+      0,
+      1,
+      0
+    ],
+    [
+      11,
+      2,
+      15,
+      2,
+      135,
+      55,
+      3
+    ],
+    [
+      4,
+      12,
+      50,
+      4,
+      60,
+      1210,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      29
+    ]
+  ],
+  "model": "vit_tiny",
+  "display_name": "ViT-Tiny",
+  "family": "baseline",
+  "best_epoch": 9,
+  "epochs_run": 10,
+  "epochs_budget": 10,
+  "train_time_min": 26.574020123481752,
+  "best_val_macro_f1": 71.14833645240718,
+  "dataset": "dermamnist",
+  "image_size": 128,
+  "spline_regularization": false,
+  "lambda_l1": 0.0,
+  "lambda_ent": 0.0
+}
