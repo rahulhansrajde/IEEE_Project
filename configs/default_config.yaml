@@ -8,6 +8,7 @@ experiment:
   output_dir: results
   checkpoint_dir: checkpoints
   deterministic: true
+  flush_denormal: true    # CPU only: flush subnormal floats to zero (large speed-up, negligible numerics)
 
 data:
   dataset: dermamnist     # dermamnist | pathmnist | pneumoniamnist | imagefolder | ham10000

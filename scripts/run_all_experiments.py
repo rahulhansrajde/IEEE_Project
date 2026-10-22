@@ -541,6 +541,9 @@ def main(argv: Optional[List[str]] = None) -> pd.DataFrame:
     n_threads = args.num_threads or cfg["experiment"].get("num_threads")
     if n_threads and device.type == "cpu":
         torch.set_num_threads(int(n_threads))
+    if device.type == "cpu" and cfg["experiment"].get("flush_denormal", True):
+        # Subnormal floats (e.g. in pretrained DenseNet BatchNorm paths) slow x86 CPUs by ~6x.
+        torch.set_flush_denormal(True)
     logger.info("config=%s device=%s threads=%d", args.config, device, torch.get_num_threads())
 
     seed = int(cfg["experiment"].get("seed", 42))
