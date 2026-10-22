@@ -37,7 +37,15 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.data import build_dataloaders, denormalize  # noqa: E402
-from src.engine import Trainer, evaluate_predictions, predict, resolve_device  # noqa: E402
+from src.engine import (  # noqa: E402
+    Trainer,
+    apply_temperature,
+    evaluate_predictions,
+    expected_calibration_error,
+    fit_temperature,
+    predict,
+    resolve_device,
+)
 from src.explainability import (  # noqa: E402
     GradCAMPlusPlus,
     overlay_heatmap,
@@ -225,6 +233,36 @@ def run_profiling(name: str, cfg: Dict[str, Any], model: torch.nn.Module, dirs: 
 
 
 # --------------------------------------------------------------- aggregation
+POST_HOC_VERSION = 1
+
+
+def refresh_post_hoc_metrics(name: str, cfg: Dict[str, Any], bundle, loaders, device: torch.device,
+                             dirs: Dict[str, Path], logger) -> None:
+    """Add checkpoint-derived metrics: temperature-scaled ECE and spline statistics."""
+    mpath = dirs["metrics"] / f"{name}_metrics.json"
+    ckpt = dirs["checkpoints"] / f"{name}_best.pt"
+    if not mpath.exists() or not ckpt.exists():
+        return
+    metrics = json.loads(mpath.read_text())
+    if metrics.get("post_hoc_version") == POST_HOC_VERSION:
+        return
+    model = _load_model(name, cfg, bundle.num_classes, dirs, device)
+    val = predict(model, loaders["val"], device)
+    temperature = fit_temperature(val["logits"], val["labels"])
+    test = _load_predictions(dirs["metrics"] / f"{name}_test_predictions.csv")
+    log_probs = np.log(np.clip(test["probs"], 1e-12, 1.0))
+    ts_probs = apply_temperature(log_probs, temperature)
+    metrics["temperature"] = temperature
+    metrics["ece_temperature_scaled"] = 100 * expected_calibration_error(
+        ts_probs, test["labels"], int(cfg.get("evaluation", {}).get("ece_bins", 15)))
+    if hasattr(model, "kan_statistics"):
+        metrics.update(model.kan_statistics())
+    metrics["post_hoc_version"] = POST_HOC_VERSION
+    MetricTracker.save_json(metrics, mpath)
+    logger.info("  %s: T=%.3f  ECE %.2f -> %.2f after temperature scaling", name, temperature,
+                metrics["ece"], metrics["ece_temperature_scaled"])
+
+
 def build_summary(names: List[str], dirs: Dict[str, Path]) -> pd.DataFrame:
     rows, per_class_rows = [], []
     for name in names:
@@ -347,12 +385,21 @@ def make_spline_figure(cfg, bundle, loaders, dirs, device, logger) -> None:
     plot_learned_splines(proposed.head.kan2, dirs["figures"], "fig2b_learned_kan_splines_output",
                          grid_shape=(rows, cols), layer_name="KAN head layer 2 (64 -> classes)",
                          out_names=bundle.class_names)
+    unreg = ABLATION_MODELS[3]
+    if (dirs["checkpoints"] / f"{unreg}_best.pt").exists():
+        model = _load_model(unreg, cfg, bundle.num_classes, dirs, device)
+        plot_learned_splines(model.head.kan2, dirs["figures"], "fig2c_learned_kan_splines_no_spline_reg",
+                             grid_shape=(rows, cols),
+                             layer_name="KAN head layer 2 trained without spline regularisation",
+                             out_names=bundle.class_names)
     logger.info("  fig2 written")
 
 
 def aggregate(cfg: Dict[str, Any], bundle, loaders, device: torch.device, dirs: Dict[str, Path], logger,
               names: List[str], skip_xai: bool = False) -> pd.DataFrame:
     """Profile missing models, merge metrics, export tables and draw all figures."""
+    for name in names:
+        refresh_post_hoc_metrics(name, cfg, bundle, loaders, device, dirs, logger)
     for name in names:
         if (dirs["metrics"] / f"{name}_metrics.json").exists() and not (dirs["metrics"] / f"{name}_hardware.json").exists():
             if (dirs["checkpoints"] / f"{name}_best.pt").exists():

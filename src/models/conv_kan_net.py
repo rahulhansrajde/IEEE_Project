@@ -241,31 +241,40 @@ class AttConvKANNet(nn.Module):
             return self.bottleneck
         return self.backbone
 
-    def kan_statistics(self, sparsity_threshold: float = 0.01) -> Dict[str, float]:
-        """Interpretability statistics of the learned splines.
+    def kan_statistics(self, sparsity_threshold: float = 0.01, top_fraction: float = 0.01) -> Dict[str, float]:
+        """Interpretability statistics of the learned splines in the KAN head.
 
-        ``edge_sparsity`` is the fraction of KAN-head edges whose importance
-        is below ``sparsity_threshold`` times the largest edge importance of
-        their layer (i.e. edges that could be pruned).
+        * ``kan_edge_sparsity``: fraction of edges whose spline importance
+          ``mean_m |w_s c_m|`` is below ``sparsity_threshold * |w_b|``, i.e. edges
+          that reduce to the symbolic form ``w_b * SiLU(x)``.
+        * ``kan_top_mass``: share of the total spline importance carried by the
+          ``top_fraction`` most important edges.
+        * ``kan_spline_entropy``: mean normalised entropy of the edge importances.
         """
         stats: Dict[str, float] = {}
         layers = [m for m in self.head.modules() if isinstance(m, KANLinear)]
         if not layers:
             return stats
         n_edges, n_sparse, ent = 0, 0, 0.0
+        importances = []
         with torch.no_grad():
             for layer in layers:
                 e = layer.edge_l1()
                 n_edges += e.numel()
-                n_sparse += int((e < sparsity_threshold * e.max()).sum())
+                n_sparse += int((e < sparsity_threshold * layer.base_weight.abs()).sum())
                 ent += float(layer.regularization_components()[1])
+                importances.append(e.flatten())
+            all_imp = torch.sort(torch.cat(importances), descending=True)[0]
+            k = max(1, int(round(top_fraction * all_imp.numel())))
+            top_mass = float(all_imp[:k].sum() / all_imp.sum().clamp_min(1e-12))
             conv_layers = [m for m in self.modules() if isinstance(m, KANConv2d)]
             conv_l1 = sum(float(m.edge_l1().mean()) for m in conv_layers)
         stats["kan_head_edges"] = float(n_edges)
         stats["kan_edge_sparsity"] = n_sparse / max(n_edges, 1)
+        stats["kan_top_mass"] = top_mass
         stats["kan_spline_entropy"] = ent / len(layers)
         stats["kan_head_mean_l1"] = float(
-            sum(float(layer.edge_l1().mean()) for layer in layers) / len(layers)
+            sum(float(layer.edge_l1().detach().mean()) for layer in layers) / len(layers)
         )
         stats["kan_conv_mean_l1"] = conv_l1 / max(len(conv_layers), 1)
         return stats

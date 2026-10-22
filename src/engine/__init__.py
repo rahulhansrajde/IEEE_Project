@@ -1,4 +1,6 @@
 from .evaluator import (
+    apply_temperature,
+    fit_temperature,
     bootstrap_ci,
     compute_metrics,
     conformal_calibrate,
@@ -12,6 +14,8 @@ from .evaluator import (
 from .trainer import EarlyStopping, Trainer, build_optimizer, resolve_device
 
 __all__ = [
+    "apply_temperature",
+    "fit_temperature",
     "bootstrap_ci",
     "compute_metrics",
     "conformal_calibrate",

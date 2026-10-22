@@ -30,8 +30,10 @@ __all__ = [
     "multiclass_auroc",
     "specificity_per_class",
     "bootstrap_ci",
+    "fit_temperature",
     "conformal_calibrate",
     "conformal_evaluate",
+    "apply_temperature",
     "compute_metrics",
     "evaluate_predictions",
 ]
@@ -142,6 +144,32 @@ def bootstrap_ci(
         "upper": float(np.percentile(values, 100 * (1 - alpha / 2))),
         "std": float(values.std()),
     }
+
+
+def fit_temperature(logits: np.ndarray, labels: np.ndarray, max_iter: int = 200) -> float:
+    """Post-hoc temperature scaling (Guo et al., 2017): ``T = argmin NLL(softmax(z / T))``.
+
+    ``logits`` may also be log-probabilities, which differ from logits only by a
+    per-sample constant and therefore give the same temperature.
+    """
+    z = torch.as_tensor(logits, dtype=torch.float64)
+    y = torch.as_tensor(labels, dtype=torch.long)
+    log_t = torch.zeros(1, dtype=torch.float64, requires_grad=True)
+    opt = torch.optim.LBFGS([log_t], lr=0.1, max_iter=max_iter, line_search_fn="strong_wolfe")
+
+    def closure():
+        opt.zero_grad()
+        loss = torch.nn.functional.cross_entropy(z / log_t.exp(), y)
+        loss.backward()
+        return loss
+
+    opt.step(closure)
+    return float(log_t.detach().exp())
+
+
+def apply_temperature(logits: np.ndarray, temperature: float) -> np.ndarray:
+    z = torch.as_tensor(logits, dtype=torch.float64) / temperature
+    return torch.softmax(z, dim=1).numpy()
 
 
 def conformal_calibrate(cal_probs: np.ndarray, cal_labels: np.ndarray, alpha: float = 0.1) -> float:

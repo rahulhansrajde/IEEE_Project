@@ -100,11 +100,15 @@ def make_table1(summary: pd.DataFrame) -> str:
         ("auroc", "{:.2f}", True),
         ("cohen_kappa", "{:.3f}", True),
         ("ece", "{:.2f}", False),
+        ("ece_temperature_scaled", "{:.2f}", False),
         ("params_m", "{:.2f}", False),
         ("head_params_k", "{:.1f}", False),
         ("gflops", "{:.3f}", False),
         ("latency_ms", "{:.2f}", False),
     ]
+    for c, _, _ in cols:
+        if c not in df.columns:
+            df[c] = np.nan
     formatted = {c: rank_format(df[c].to_numpy(dtype=float), f, hib) for c, f, hib in cols}
     lines = [
         r"\begin{table*}[!t]",
@@ -114,13 +118,14 @@ def make_table1(summary: pd.DataFrame) -> str:
         r"Best value per column in \textbf{bold}, second best \underline{underlined}; "
         r"$\uparrow$/$\downarrow$: higher/lower is better.}",
         r"\label{tab:baselines}",
-        r"\setlength{\tabcolsep}{3.6pt}",
-        r"\begin{tabular}{l ccccc c cccc}",
+        r"\setlength{\tabcolsep}{3.2pt}",
+        r"\resizebox{\textwidth}{!}{%",
+        r"\begin{tabular}{l ccccc cc cccc}",
         r"\toprule",
-        r"& \multicolumn{6}{c}{\textit{Diagnostic performance}} & \multicolumn{4}{c}{\textit{Efficiency}} \\",
-        r"\cmidrule(lr){2-7} \cmidrule(lr){8-11}",
+        r"& \multicolumn{7}{c}{\textit{Diagnostic performance and calibration}} & \multicolumn{4}{c}{\textit{Efficiency}} \\",
+        r"\cmidrule(lr){2-8} \cmidrule(lr){9-12}",
         r"Model & Acc.\,(\%)$\uparrow$ & B-Acc.\,(\%)$\uparrow$ & Macro-F1\,(\%)$\uparrow$ [95\% CI] & "
-        r"AUROC\,(\%)$\uparrow$ & $\kappa\uparrow$ & ECE\,(\%)$\downarrow$ & Params\,(M)$\downarrow$ & "
+        r"AUROC\,(\%)$\uparrow$ & $\kappa\uparrow$ & ECE\,(\%)$\downarrow$ & ECE$_{TS}$\,(\%)$\downarrow$ & Params\,(M)$\downarrow$ & "
         r"Head\,(K)$\downarrow$ & GFLOPs$\downarrow$ & Lat.\,(ms)$\downarrow$ \\",
         r"\midrule",
     ]
@@ -136,13 +141,14 @@ def make_table1(summary: pd.DataFrame) -> str:
             formatted["auroc"][i],
             formatted["cohen_kappa"][i],
             formatted["ece"][i],
+            formatted["ece_temperature_scaled"][i],
             formatted["params_m"][i],
             formatted["head_params_k"][i],
             formatted["gflops"][i],
             formatted["latency_ms"][i],
         ]
         lines.append(f"{name} & " + " & ".join(cells) + r" \\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table*}", ""]
+    lines += [r"\bottomrule", r"\end{tabular}}", r"\end{table*}", ""]
     return "\n".join(lines)
 
 
@@ -167,15 +173,17 @@ def make_table2(summary: pd.DataFrame) -> str:
         r"\centering",
         r"\caption{Ablation study of the Att-ConvKAN components (same backbone, data, budget and seed). "
         r"$\Delta$F1: macro-F1 change w.r.t.\ the backbone + MLP-head reference (row 1). "
-        r"Sparsity: fraction of KAN-head edges with importance $<1\%$ of the layer maximum.}",
+        r"Symb.: share of KAN-head edges whose spline term is $<1\%$ of their SiLU weight, i.e.\ edges that "
+        r"reduce to the symbolic form $w_b\,\mathrm{SiLU}(x)$; $H$: normalised entropy of the spline edge "
+        r"importances (lower = more concentrated).}",
         r"\label{tab:ablation}",
         r"\setlength{\tabcolsep}{2.4pt}",
         r"\resizebox{\columnwidth}{!}{%",
-        r"\begin{tabular}{cccc ccccc cc c}",
+        r"\begin{tabular}{cccc ccccc cc cc c}",
         r"\toprule",
         r"\rotatebox{90}{KANConv} & \rotatebox{90}{Attention} & \rotatebox{90}{KAN head} & "
         r"\rotatebox{90}{Spline reg.} & Acc. & B-Acc. & Macro-F1 & AUROC & ECE$\downarrow$ & "
-        r"Params (M) & Head (K) & $\Delta$F1 \\",
+        r"Params (M) & Head (K) & Symb. (\%) & $H$ & $\Delta$F1 \\",
         r"\midrule",
     ]
     for i, row in df.iterrows():
@@ -183,22 +191,14 @@ def make_table2(summary: pd.DataFrame) -> str:
         flags = [check if comps.get(k) else cross for k in ("kan_conv", "attention", "kan_head", "spline_reg")]
         delta = row["macro_f1"] - ref_f1
         delta_s = "--" if row["model"] == ABLATION_MODELS[0] or np.isnan(delta) else f"{delta:+.2f}"
+        sym = row.get("kan_edge_sparsity", np.nan)
+        ent = row.get("kan_spline_entropy", np.nan)
+        spline_cells = ["--", "--"] if pd.isna(sym) else [f"{100 * sym:.1f}", f"{ent:.3f}"]
         if row["model"] == PROPOSED_MODEL:
             lines.append(r"\midrule")
-        cells = flags + [formatted[c][i] for c, _, _ in cols] + [delta_s]
+        cells = flags + [formatted[c][i] for c, _, _ in cols] + spline_cells + [delta_s]
         lines.append(" & ".join(cells) + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}}", r"\end{table}", ""]
-
-    if "kan_edge_sparsity" in df.columns:
-        kan_rows = df[~df["kan_edge_sparsity"].isna()]
-        if len(kan_rows):
-            lines.insert(-4, r"\midrule")
-            note = "; ".join(
-                f"{_latex_escape(MODEL_SPECS[r['model']].display_name)}: sparsity {100 * r['kan_edge_sparsity']:.1f}\\%, "
-                f"$H$={r['kan_spline_entropy']:.3f}"
-                for _, r in kan_rows.iterrows()
-            )
-            lines.insert(-4, r"\multicolumn{12}{l}{\footnotesize Spline statistics -- " + note + r"} \\")
     return "\n".join(lines)
 
 
@@ -241,7 +241,8 @@ def make_macros(summary: pd.DataFrame, per_class: Optional[pd.DataFrame] = None)
     fmt = {
         "cohen_kappa": "{:.3f}", "params_m": "{:.2f}", "gflops": "{:.3f}", "head_params_k": "{:.1f}",
         "model_size_mb": "{:.2f}", "latency_ms": "{:.2f}", "throughput_img_s": "{:.0f}",
-        "conformal_set_size": "{:.2f}", "kan_edge_sparsity": "{:.3f}", "kan_spline_entropy": "{:.3f}",
+        "conformal_set_size": "{:.2f}", "kan_edge_sparsity": "{:.3f}", "kan_spline_entropy": "{:.4f}",
+        "kan_top_mass": "{:.3f}", "temperature": "{:.3f}", "kan_head_mean_l1": "{:.2e}", "kan_conv_mean_l1": "{:.2e}",
         "train_time_min": "{:.1f}", "best_epoch": "{:.0f}",
     }
     for _, row in summary.iterrows():
