@@ -1,0 +1,88 @@
+# Full benchmark: 50-epoch, 224x224 high-resolution DermaMNIST (HAM10000) runs.
+# Mixup/CutMix and three B-spline grid refinements are enabled; designed for one GPU.
+experiment:
+  name: full_benchmark
+  seed: 42
+  device: auto            # auto -> cuda > mps > cpu
+  num_threads: 4          # torch intra-op threads on CPU
+  output_dir: results
+  checkpoint_dir: checkpoints
+  deterministic: true
+
+data:
+  dataset: dermamnist     # dermamnist | pathmnist | pneumoniamnist | imagefolder | ham10000
+  root: data
+  data_dir: null          # required for imagefolder / ham10000
+  image_size: 224
+  native_size: 224        # MedMNIST+ resolution that is downloaded (28/64/128/224)
+  batch_size: 32
+  eval_batch_size: 64
+  num_workers: 4
+  augment: true
+  clahe: false
+  split_fractions: [0.7, 0.1, 0.2]   # used only for imagefolder / ham10000
+  max_samples_per_split: null
+
+model:
+  backbone: mobilenetv3_small_100
+  pretrained: true
+  kan_hidden: 64
+  mlp_hidden: 1024
+  grid_size: 5
+  spline_order: 3
+  dropout: 0.2
+  attention_reduction: 16
+  bottleneck_reduction: 4
+
+training:
+  epochs: 50
+  optimizer: adamw
+  lr: 0.0005
+  head_lr_multiplier: 5.0
+  weight_decay: 0.0001
+  warmup_epochs: 1
+  scheduler:
+    T_0: 10
+    T_mult: 2
+    eta_min: 0.000001
+  early_stopping_patience: 12
+  monitor: val_macro_f1
+  grad_clip: 5.0
+  amp: true               # mixed precision is enabled automatically on CUDA only
+  grid_update_epochs: [3, 10, 20]
+  grid_update_samples: 512
+  mixup:
+    enabled: true
+    mixup_alpha: 0.2
+    cutmix_alpha: 1.0
+    prob: 0.5
+
+loss:
+  gamma: 2.0
+  label_smoothing: 0.05
+  class_weight_method: effective_number   # inverse | inverse_sqrt | effective_number | none
+  class_weight_beta: 0.999
+  lambda_l1: 1.0
+  lambda_ent: 0.1
+
+evaluation:
+  n_bootstrap: 1000
+  ece_bins: 15
+  conformal_alpha: 0.1
+  latency_warmup: 20
+  latency_runs: 100
+  throughput_batch_size: 32
+
+experiments:
+  proposed: att_convkan_proposed
+  baselines: [resnet50, densenet121, mobilenetv3_small, vit_tiny, convnext_tiny]
+  ablations:
+    - ablation_1_backbone_mlp
+    - ablation_2_backbone_kan_no_att
+    - ablation_3_backbone_att_mlp
+    - ablation_4_full_no_spline_reg
+
+xai:
+  num_samples: 4
+  tsne_max_points: 2000
+  spline_grid: [3, 4]

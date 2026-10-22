@@ -1,0 +1,56 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# ---- Datasets, checkpoints and large binaries ----
+data/
+checkpoints/
+*.npz
+*.npy
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+
+# ---- Results: ignore everything except the tracked publication artefacts ----
+results/*
+!results/metrics/
+!results/figures/
+!results/tables/
+!results/logs/
+results/metrics/*
+!results/metrics/*.csv
+!results/metrics/*.json
+results/figures/*
+!results/figures/*.png
+!results/figures/*.pdf
+results/tables/*
+!results/tables/*.tex
+results/logs/*
+!results/logs/*.log
+!results/**/.gitkeep
+
+# ---- LaTeX build files (paper/main.tex is tracked) ----
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.synctex.gz
+paper/*.fls
+paper/*.fdb_latexmk
+
+# ---- OS / editors ----
+.DS_Store
+.idea/
+.vscode/
