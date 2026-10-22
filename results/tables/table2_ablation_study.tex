@@ -1,0 +1,19 @@
+\begin{table}[!t]
+\centering
+\caption{Ablation study of the Att-ConvKAN components (same backbone, data, budget and seed). $\Delta$F1: macro-F1 change w.r.t.\ the backbone + MLP-head reference (row 1). Symb.: share of KAN-head edges whose spline term is $<1\%$ of their SiLU weight, i.e.\ edges that reduce to the symbolic form $w_b\,\mathrm{SiLU}(x)$; $H$: normalised entropy of the spline edge importances (lower = more concentrated).}
+\label{tab:ablation}
+\setlength{\tabcolsep}{2.2pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{cccc cccc c cc c}
+\toprule
+\rotatebox{90}{KANConv} & \rotatebox{90}{Attention} & \rotatebox{90}{KAN head} & \rotatebox{90}{Spline reg.} & B-Acc. & Macro-F1 & AUROC & ECE$\downarrow$ & Head (K) & Symb. (\%) & $H$ & $\Delta$F1 \\
+\midrule
+-- & -- & -- & -- & 69.07 & 64.67 & 94.65 & 20.50 & \underline{599.2} & -- & -- & -- \\
+-- & -- & \checkmark & \checkmark & 70.12 & \underline{65.57} & \textbf{95.19} & 20.00 & \textbf{374.4} & 100.0 & 0.061 & +0.90 \\
+-- & \checkmark & -- & -- & \underline{70.90} & 62.87 & 94.73 & \textbf{17.73} & \underline{599.2} & -- & -- & -1.80 \\
+\checkmark & \checkmark & \checkmark & -- & \textbf{71.65} & \textbf{66.23} & \underline{94.97} & \underline{19.06} & \textbf{374.4} & 41.2 & 0.858 & +1.56 \\
+\midrule
+\checkmark & \checkmark & \checkmark & \checkmark & 67.90 & 63.05 & 94.43 & 20.59 & \textbf{374.4} & 100.0 & 0.001 & -1.62 \\
+\bottomrule
+\end{tabular}}
+\end{table}

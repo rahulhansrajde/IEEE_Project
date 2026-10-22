@@ -1,0 +1,22 @@
+\begin{table*}[!t]
+\centering
+\caption{Comparison with state-of-the-art baselines. DermaMNIST (HAM10000) test set ($n=2005$), $128\times128$ inputs, 10-epoch budget. Latency: batch size 1 on CPU. Macro-F1 is reported with its 95\% bootstrap confidence interval. Best value per column in \textbf{bold}, second best \underline{underlined}; $\uparrow$/$\downarrow$: higher/lower is better.}
+\label{tab:baselines}
+\setlength{\tabcolsep}{3.2pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l ccccc cc cccc}
+\toprule
+& \multicolumn{7}{c}{\textit{Diagnostic performance and calibration}} & \multicolumn{4}{c}{\textit{Efficiency}} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-12}
+Model & Acc.\,(\%)$\uparrow$ & B-Acc.\,(\%)$\uparrow$ & Macro-F1\,(\%)$\uparrow$ [95\% CI] & AUROC\,(\%)$\uparrow$ & $\kappa\uparrow$ & ECE\,(\%)$\downarrow$ & ECE$_{TS}$\,(\%)$\downarrow$ & Params\,(M)$\downarrow$ & Head\,(K)$\downarrow$ & GFLOPs$\downarrow$ & Lat.\,(ms)$\downarrow$ \\
+\midrule
+ResNet-50 & 82.24 & 75.00 & 71.96 {\scriptsize [68.4, 75.2]} & 95.63 & 0.663 & 18.96 & 2.43 & 23.52 & 14.3 & 2.669 & 48.00 \\
+DenseNet-121 & \textbf{84.54} & \underline{76.31} & \textbf{75.16} {\scriptsize [71.4, 78.5]} & \textbf{96.80} & \textbf{0.712} & \textbf{17.70} & \underline{1.86} & 6.96 & 7.2 & 1.850 & 62.98 \\
+MobileNetV3-S & 77.46 & 67.70 & 62.27 {\scriptsize [58.5, 65.6]} & 94.05 & 0.582 & \underline{18.19} & 2.69 & \textbf{1.53} & 598.0 & \textbf{0.038} & \textbf{9.00} \\
+ViT-Tiny & \underline{83.09} & \textbf{79.27} & \underline{74.43} {\scriptsize [71.1, 77.5]} & \underline{96.55} & \underline{0.685} & 21.31 & \textbf{1.56} & 5.50 & \textbf{1.4} & 0.709 & \underline{14.77} \\
+ConvNeXt-T & 82.49 & 76.16 & 72.35 {\scriptsize [68.6, 75.6]} & 96.41 & 0.673 & 20.35 & 2.77 & 27.83 & \underline{6.9} & 2.909 & 52.11 \\
+\midrule
+Att-ConvKAN (Ours) & 79.00 & 67.90 & 63.05 {\scriptsize [59.5, 66.8]} & 94.43 & 0.604 & 20.59 & 2.30 & \underline{1.59} & 374.4 & \underline{0.048} & 16.09 \\
+\bottomrule
+\end{tabular}}
+\end{table*}

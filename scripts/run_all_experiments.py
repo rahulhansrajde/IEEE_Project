@@ -364,7 +364,7 @@ def make_gradcam_figure(cfg, bundle, dirs, device, best_baseline: Optional[str],
     n_cols = 4 if cams_b is not None else 3
     per_row = 2  # samples per figure row -> wide, short layout for a two-column page
     n_rows = int(np.ceil(len(idx) / per_row))
-    fig, axes = plt.subplots(n_rows, per_row * n_cols, figsize=(7.16, 1.05 * n_rows + 0.25), squeeze=False)
+    fig, axes = plt.subplots(n_rows, per_row * n_cols, figsize=(7.16, 1.2 * n_rows + 0.3), squeeze=False)
     names = bundle.class_names
     base_name = MODEL_SPECS[best_baseline].display_name if cams_b is not None else ""
     for r in range(len(idx)):
@@ -372,13 +372,13 @@ def make_gradcam_figure(cfg, bundle, dirs, device, best_baseline: Optional[str],
         pred_p = int(probs_p[r].argmax())
         mark = "" if pred_p == labels[r] else " (error)"
         panels = [
-            (img, f"GT {names[labels[r]]} / pred {names[pred_p]}{mark}"),
-            (overlay_heatmap(img, att[r], 0.5, "viridis"), "Ours: attention"),
-            (overlay_heatmap(img, cams_p[r]), "Ours: Grad-CAM++"),
+            (img, f"GT: {names[labels[r]]}\nours: {names[pred_p]}{mark}"),
+            (overlay_heatmap(img, att[r], 0.5, "viridis"), "Ours:\nattention"),
+            (overlay_heatmap(img, cams_p[r]), "Ours:\nGrad-CAM++"),
         ]
         if cams_b is not None:
             pb = int(probs_b[r].argmax())
-            panels.append((overlay_heatmap(img, cams_b[r]), f"{base_name} (pred {names[pb]})"))
+            panels.append((overlay_heatmap(img, cams_b[r]), f"{base_name}\n(pred: {names[pb]})"))
         for c, (im, title) in enumerate(panels):
             ax = axes[r // per_row, (r % per_row) * n_cols + c]
             ax.imshow(im)
@@ -386,7 +386,7 @@ def make_gradcam_figure(cfg, bundle, dirs, device, best_baseline: Optional[str],
             ax.axis("off")
     for ax in axes.flat[len(idx) * n_cols:]:
         ax.axis("off")
-    fig.subplots_adjust(left=0.005, right=0.995, top=0.93, bottom=0.01, wspace=0.04, hspace=0.18)
+    fig.subplots_adjust(left=0.005, right=0.995, top=0.88, bottom=0.01, wspace=0.05, hspace=0.32)
     save_figure(fig, dirs["figures"], "fig1_gradcam_comparison")
     logger.info("  fig1 written (test indices %s)", idx)
 

@@ -1,0 +1,245 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{amssymb}
+\usepackage[caption=false,font=footnotesize]{subfig}
+
+\graphicspath{{../results/figures/}}
+% Allow several two-column figures per page so that floats stay near their text.
+\setcounter{dbltopnumber}{3}
+\renewcommand{\dbltopfraction}{0.92}
+\renewcommand{\dblfloatpagefraction}{0.85}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\textfraction}{0.08}
+% Every number quoted in the text is read from the generated results so that the
+% manuscript always matches the experiments: \res{<model>}{<metric>}.
+\input{../results/tables/results_macros.tex}
+
+\newcommand{\ours}{Att-ConvKAN}
+
+\begin{document}
+
+\title{Attention-Guided Convolutional Kolmogorov-Arnold Networks (Att-ConvKAN) for Parameter-Efficient and Explainable Medical Image Diagnosis}
+
+\author{\IEEEauthorblockN{Rahul Hansraj}
+\IEEEauthorblockA{\textit{Independent Researcher}\\
+Email: 1rahulhansraj@gmail.com}}
+
+\maketitle
+
+\begin{abstract}
+Kolmogorov-Arnold networks (KANs) replace fixed activations by learnable univariate B-spline functions on the edges of a network, promising compact and inspectable models. We investigate whether this helps lightweight medical image classifiers and introduce \ours, which augments a pretrained MobileNetV3-Small backbone with a depthwise convolutional KAN bottleneck, a coordinate-channel attention module and a two-layer KAN classification head, trained with a class-balanced focal loss plus spline L1 and entropy regularisation. All KAN layers are implemented in pure, vectorised PyTorch. On the official DermaMNIST (HAM10000) test split ($n=\res{att_convkan_proposed}{n_test}$, seven classes, $128\times128$ inputs, identical ten-epoch budget for all models), \ours\ obtains \res{att_convkan_proposed}{accuracy}\% accuracy, \res{att_convkan_proposed}{balanced_accuracy}\% balanced accuracy, \res{att_convkan_proposed}{macro_f1}\% macro-F1 and \res{att_convkan_proposed}{auroc}\% AUROC with \res{att_convkan_proposed}{params_m}\,M parameters, on par with the MobileNetV3-Small baseline (\res{mobilenetv3_small}{macro_f1}\% macro-F1; paired bootstrap $p\res{paired@mobilenetv3_small}{p_value}$) while its KAN head needs \res{derived}{head_reduction_pct}\% fewer parameters than the MLP head. The larger baselines (\res{derived}{min_heavy_params_m}--\res{derived}{max_heavy_params_m}\,M parameters), led by \bestbaselinename, remain clearly more accurate. In the ablations, the best lightweight variant is the full architecture without spline regularisation (\res{ablation_4_full_no_spline_reg}{macro_f1}\% macro-F1); the regulariser makes \res{att_convkan_proposed}{kan_edge_sparsity_pct}\% of the head's edges reduce to closed-form SiLU terms at a cost of \res{derived}{reg_cost_f1} macro-F1 points ($p\res{paired@ablation_4_full_no_spline_reg}{p_value}$). On CPU, the B-spline evaluation makes \ours\ slower per image than its baseline (\res{att_convkan_proposed}{latency_ms} vs.\ \res{mobilenetv3_small}{latency_ms}\,ms). We release code, results and all figures.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Kolmogorov-Arnold networks, B-splines, attention, dermoscopy, skin lesion classification, explainable AI, parameter efficiency, calibration.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Deep convolutional networks match dermatologists on curated skin-lesion benchmarks~\cite{esteva2017dermatologist,codella2019isic}, yet three obstacles still separate them from routine clinical use. First, the strongest models (ResNet~\cite{he2016resnet}, DenseNet~\cite{huang2017densenet}, ConvNeXt~\cite{liu2022convnext}, ViT~\cite{dosovitskiy2021vit}) carry tens of millions of parameters, which complicates deployment on dermatoscopes, smartphones and edge devices. Second, their decision functions are opaque: post-hoc saliency maps~\cite{selvaraju2017gradcam,chattopadhay2018gradcampp} indicate \emph{where} a network looks but not \emph{how} individual features are transformed into a diagnosis. Third, dermoscopy datasets such as HAM10000~\cite{tschandl2018ham10000} are severely imbalanced (melanocytic nevi constitute two thirds of the images, dermatofibroma about one percent), so headline accuracy hides poor sensitivity on rare but clinically important classes.
+
+Kolmogorov-Arnold Networks (KANs)~\cite{liu2025kan,liu2024kan2} offer a different trade-off. Motivated by the Kolmogorov-Arnold representation theorem~\cite{kolmogorov1957}, KANs place \emph{learnable univariate functions}, parameterised as B-splines~\cite{deboor1978splines}, on the edges of the network instead of fixed activations on its nodes. Each edge function can be plotted and inspected, and KANs have been reported to reach a given accuracy with fewer parameters than multilayer perceptrons (MLPs) on scientific regression tasks. Follow-up work has transferred the idea to convolutions~\cite{bodner2024convkan,drokin2024kanconv}, transformers~\cite{yang2025kat}, alternative bases~\cite{li2024fastkan,bozorgasl2024wavkan} and medical segmentation~\cite{li2025ukan}. Whether KANs help \emph{medical image classification} under a realistic, imbalanced protocol, and at what computational cost, remains largely unmeasured.
+
+This paper studies that question with \ours, a hybrid that keeps a lightweight pretrained CNN backbone and introduces KAN computation at the two places where we expect it to matter most: (i) a depthwise \emph{KANConv} bottleneck that refines the last feature map with learnable spline kernels, (ii) a \emph{coordinate-channel attention} module~\cite{woo2018cbam,hou2021coordatt} that re-weights lesion regions, and (iii) a two-layer \emph{KAN classification head} trained with a composite class-balanced focal~\cite{lin2017focal,cui2019classbalanced} and spline-sparsity loss. Our contributions are:
+\begin{itemize}
+\item A pure-PyTorch, fully vectorised implementation of \texttt{KANLinear} and \texttt{KANConv2d} (exact Cox-de Boor recursion, adaptive grid refinement, L1/entropy spline regularisers) that runs unchanged on CPU, MPS and CUDA.
+\item The \ours\ architecture, whose KAN head uses \res{derived}{head_reduction_pct}\% fewer parameters than the native 1024-unit MLP head of the same backbone.
+\item A controlled benchmark on DermaMNIST (HAM10000)~\cite{yang2023medmnist} against five standard backbones and four ablations under an identical recipe, reporting balanced accuracy, macro-F1 with bootstrap confidence intervals, AUROC, calibration (ECE)~\cite{guo2017calibration}, split-conformal coverage~\cite{angelopoulos2021gentle}, and measured FLOPs and latency.
+\item An explainability analysis combining Grad-CAM++ with direct visualisation of the learned spline activations $\phi_{j,i}(x)$.
+\end{itemize}
+
+\section{Related Work}
+\textbf{CNNs and transformers for dermoscopy.} Transfer learning from ImageNet with ResNet~\cite{he2016resnet}, DenseNet~\cite{huang2017densenet} or EfficientNet-style backbones dominates the ISIC challenges~\cite{codella2019isic}. Mobile architectures such as MobileNetV3~\cite{howard2019mobilenetv3} trade a few points of accuracy for an order of magnitude fewer FLOPs, while ViTs~\cite{dosovitskiy2021vit} and modernised ConvNets~\cite{liu2022convnext} deliver strong accuracy at substantially higher cost. MedMNIST v2~\cite{yang2023medmnist} standardises HAM10000 as DermaMNIST with fixed splits, enabling reproducible comparisons.
+
+\textbf{Attention.} Squeeze-and-excitation~\cite{hu2018senet} re-weights channels from global average pooling; CBAM~\cite{woo2018cbam} adds max pooling and a spatial branch; coordinate attention~\cite{hou2021coordatt} factorises spatial pooling along height and width so that positional information survives. We combine the CBAM channel branch with the coordinate spatial branch.
+
+\textbf{Kolmogorov-Arnold networks.} KAN~\cite{liu2025kan} parameterises every edge by a spline plus a SiLU residual; KAN~2.0~\cite{liu2024kan2} extends the framework towards scientific discovery. FastKAN~\cite{li2024fastkan} replaces B-splines with radial basis functions, Wav-KAN~\cite{bozorgasl2024wavkan} with wavelets. Convolutional KANs~\cite{bodner2024convkan,drokin2024kanconv} apply spline functions to image patches, KAT~\cite{yang2025kat} inserts group-rational KAN layers into ViTs, and U-KAN~\cite{li2025ukan} adds tokenised KAN blocks to U-Net for medical segmentation. Most of these works evaluate balanced natural-image or toy benchmarks; we focus on imbalanced clinical classification and report efficiency \emph{measured} on hardware rather than parameter counts alone.
+
+\section{Proposed Methodology}
+\begin{figure}[!t]
+\centering
+\setlength{\fboxsep}{4pt}
+\fbox{\parbox{0.94\columnwidth}{\footnotesize\centering
+Image $\mathbf{x}\in\mathbb{R}^{3\times H\times W}$\\[1pt]
+$\downarrow$ MobileNetV3-S backbone (ImageNet) \\[1pt]
+$\mathbf{F}\in\mathbb{R}^{576\times \frac{H}{32}\times\frac{W}{32}}$\\[1pt]
+$\downarrow$ KANConv bottleneck: $1{\times}1$ reduce $\rightarrow$ depthwise $3{\times}3$ \texttt{KANConv2d} $\rightarrow$ $1{\times}1$ expand $+$ residual\\[1pt]
+$\downarrow$ Coordinate-channel attention: $\mathbf{F}\odot M_c\odot M_h\odot M_w$\\[1pt]
+$\downarrow$ GAP $\rightarrow$ LN $\rightarrow$ Dropout $\rightarrow$ \texttt{KANLinear}(576,64) $\rightarrow$ LN $\rightarrow$ \texttt{KANLinear}(64,$K$)\\[1pt]
+Logits $\mathbf{z}\in\mathbb{R}^{K}$ \;$\Rightarrow$\; $\mathcal{L}_{\text{focal}}+\lambda_1\mathcal{L}_{L1}+\lambda_H\mathcal{L}_{H}$}}
+\caption{Overview of \ours. KAN components are typeset in \texttt{monospace}.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{B-spline KAN layers}
+A \texttt{KANLinear} layer maps $\mathbf{x}\in\mathbb{R}^{d_{in}}$ to $\mathbf{y}\in\mathbb{R}^{d_{out}}$ with $y_j=\sum_{i=1}^{d_{in}}\phi_{j,i}(x_i)$ and
+\begin{equation}
+\phi_{j,i}(x)=w^{b}_{j,i}\,\mathrm{SiLU}(x)+w^{s}_{j,i}\sum_{m=0}^{G+k-1}c_{j,i,m}\,B_{m,k}(x).
+\label{eq:kan}
+\end{equation}
+The bases are defined on a uniform knot vector $t_0<\dots<t_{G+2k}$ that splits $[-1,1]$ into $G$ intervals and is extended by $k$ knots on each side, and are evaluated with the Cox-de Boor recursion~\cite{deboor1978splines}
+\begin{align}
+B_{m,0}(x)&=\mathbf{1}[t_m\le x<t_{m+1}],\\
+B_{m,p}(x)&=\tfrac{x-t_m}{t_{m+p}-t_m}B_{m,p-1}(x)\nonumber\\
+&\quad+\tfrac{t_{m+p+1}-x}{t_{m+p+1}-t_{m+1}}B_{m+1,p-1}(x).
+\end{align}
+We use cubic splines ($k{=}3$) and $G{=}5$, i.e.\ $G+k=8$ coefficients per edge. The recursion is vectorised over the batch, input features and bases, so a layer reduces to two dense matrix products (SiLU branch and spline branch) and runs on any PyTorch device. Because the spline is only expressive inside the grid, inputs are layer-normalised before each \texttt{KANLinear}. During training the knots are refitted once to the empirical input quantiles (with a $2\%$ uniform mixture) and the coefficients are re-estimated by least squares so that the function computed by the layer is preserved (grid update of~\cite{liu2025kan}).
+
+\subsection{KANConv2d and the KANConv bottleneck}
+\texttt{KANConv2d} unfolds the input into patches $\mathbf{P}\in\mathbb{R}^{B\times C_{in}k_hk_w\times L}$ and replaces every kernel weight by an edge function,
+\begin{equation}
+Y_{o,\ell}=\sum_{p\in\mathcal{G}(o)}\phi_{o,p}\big(P_{p,\ell}\big),
+\end{equation}
+where $\mathcal{G}(o)$ indexes the patch elements of the group of output channel $o$; outputs are folded to $B\times C_{out}\times H'\times W'$ and batch-normalised (a BatchNorm on the input keeps activations inside the grid). The bottleneck reduces $C$ channels to $C/4$ with a $1{\times}1$ convolution, applies a \emph{depthwise} $3{\times}3$ \texttt{KANConv2d} (each channel learns nine spline-shaped taps), expands back to $C$ and adds a residual connection. Depthwise grouping keeps the cost at $9(G{+}k{+}2)$ parameters per channel.
+
+\subsection{Coordinate-channel attention}
+Given $\mathbf{F}\in\mathbb{R}^{C\times H\times W}$, the channel mask combines average and max pooling through a shared bottleneck MLP, $M_c=\sigma\!\big(\mathrm{MLP}(\mathrm{GAP}(\mathbf{F}))+\mathrm{MLP}(\mathrm{GMP}(\mathbf{F}))\big)$. The re-weighted map $\mathbf{F}'=M_c\odot\mathbf{F}$ is pooled along each spatial direction,
+\begin{equation}
+z^h_c(h)=\tfrac{1}{W}\textstyle\sum_{w}F'_c(h,w),\quad z^w_c(w)=\tfrac{1}{H}\textstyle\sum_{h}F'_c(h,w),
+\end{equation}
+the two descriptors are concatenated, transformed by $f=\delta(\mathrm{BN}(W_1[\mathbf{z}^h;\mathbf{z}^w]))$ and split again into $M_h=\sigma(W_hf^h)\in\mathbb{R}^{C\times H\times 1}$ and $M_w=\sigma(W_wf^w)\in\mathbb{R}^{C\times 1\times W}$. The output is $\mathbf{F}''=\mathbf{F}'\odot M_h\odot M_w$. Unlike a single 2-D spatial mask, the factorised masks retain the row and column of a lesion, which helps to suppress hair, ruler and vignetting artefacts at the image border.
+
+\subsection{Composite focal-spline loss}
+Let $p_c$ be the softmax probabilities, $q_c=(1-\epsilon)\mathbf{1}[c{=}y]+\epsilon/K$ the label-smoothed target and $\alpha_y$ the class-balanced weight of Cui et al.~\cite{cui2019classbalanced}, $\alpha_c\propto(1-\beta)/(1-\beta^{n_c})$, computed automatically from the training counts $n_c$ and normalised to mean one. We minimise
+\begin{equation}
+\mathcal{L}=\underbrace{-\alpha_y\sum_{c}q_c(1-p_c)^{\gamma}\log p_c}_{\mathcal{L}_{\text{focal}}}+\lambda_1\sum_{\ell}\mathcal{L}^{(\ell)}_{L1}+\lambda_H\sum_{\ell}\mathcal{L}^{(\ell)}_{H},
+\end{equation}
+with $\gamma=2$, $\epsilon=0.05$ and $\beta=0.999$. For each KAN layer $\ell$ with edge importances $a_{j,i}=\frac{1}{G+k}\sum_m|w^s_{j,i}c_{j,i,m}|$, the L1 term is $\mathcal{L}_{L1}=\mathrm{mean}_{j,i}\,a_{j,i}$ and the entropy term is the normalised Shannon entropy $\mathcal{L}_{H}=-\frac{1}{\log N}\sum_{j,i}\pi_{j,i}\log\pi_{j,i}$ with $\pi=a/\sum a$ over the $N$ edges; together they push the network towards few, strong edge functions that are easier to inspect.
+
+\section{Experimental Setup}
+\textbf{Dataset.} We use DermaMNIST~\cite{yang2023medmnist}, the standardised version of HAM10000~\cite{tschandl2018ham10000} with the official split of \res{att_convkan_proposed}{n_test} test images (7{,}007 training and 1{,}003 validation images) in seven classes: actinic keratoses (\texttt{akiec}), basal cell carcinoma (\texttt{bcc}), benign keratosis (\texttt{bkl}), dermatofibroma (\texttt{df}), melanoma (\texttt{mel}), melanocytic nevi (\texttt{nv}) and vascular lesions (\texttt{vasc}). The training set is imbalanced by a factor of 59 (4{,}693 \texttt{nv} vs.\ 80 \texttt{df}). We use the $128\times128$ MedMNIST+ release. The code also supports raw HAM10000 with lesion-level splits and arbitrary \texttt{ImageFolder} datasets.
+
+\textbf{Models.} All Att-ConvKAN variants share an ImageNet-pretrained MobileNetV3-Small backbone~\cite{howard2019mobilenetv3} whose unused classifier layers are removed. Baselines are ImageNet-pretrained ResNet-50, DenseNet-121, MobileNetV3-Small (native 1024-unit head), ViT-Tiny/16 and ConvNeXt-Tiny from \texttt{timm}. The four ablations remove components one at a time (Table~\ref{tab:ablation}); the MLP head uses the same width (1024) as MobileNetV3's native head.
+
+\textbf{Training.} Every model is trained with the \emph{same} recipe: AdamW (learning rate $5{\times}10^{-4}$, $5\times$ for newly initialised modules, weight decay $10^{-4}$), one warm-up epoch followed by cosine annealing with warm restarts~\cite{loshchilov2017sgdr,loshchilov2019adamw}, batch size 64, \res{att_convkan_proposed}{epochs_budget} epochs, gradient clipping at 5, early stopping on validation macro-F1, flips/rotations/resized crops/colour jitter, and the class-balanced focal loss above (spline terms, $\lambda_1=1$ and $\lambda_H=0.1$, apply only to models with KAN layers and are disabled in ablation~4). The checkpoint with the best validation macro-F1 is evaluated once on the test set. The seed is fixed to 42. Because the experiments were run on a 4-core CPU without a GPU, the epoch budget is short; the repository's default configuration specifies 50-epoch, $224\times224$ training with Mixup/CutMix~\cite{zhang2018mixup,yun2019cutmix} for GPU runs.
+
+\textbf{Metrics.} We report accuracy, balanced accuracy (mean per-class recall), macro-F1 with a 95\% percentile-bootstrap confidence interval (1{,}000 resamples), one-vs-rest macro AUROC, Cohen's $\kappa$, and top-label expected calibration error over 15 bins~\cite{guo2017calibration}. As an additional reliability measure we calibrate split-conformal prediction sets~\cite{angelopoulos2021gentle} on the validation set at $\alpha=0.1$ and report test coverage and mean set size. Efficiency is measured on the same CPU: trainable parameters, classification-head parameters, checkpoint size, FLOPs (counted by PyTorch's dispatcher plus the analytic cost of the B-spline recursion), and single-image latency averaged over 100 timed passes after 20 warm-up passes (subnormal floating-point values are flushed to zero, which avoids a $\sim$6$\times$ CPU slow-down we observed for pretrained DenseNet-121; it only affects magnitudes below $10^{-38}$).
+
+\section{Results and Ablation Analysis}
+\input{../results/tables/table1_baseline_comparison.tex}
+
+\subsection{Comparison with baselines}
+Table~\ref{tab:baselines} summarises the test performance. \ours\ reaches \res{att_convkan_proposed}{accuracy}\% accuracy, \res{att_convkan_proposed}{balanced_accuracy}\% balanced accuracy, \res{att_convkan_proposed}{macro_f1}\% macro-F1 (95\% CI \res{att_convkan_proposed}{macro_f1_ci_lower}--\res{att_convkan_proposed}{macro_f1_ci_upper}) and \res{att_convkan_proposed}{auroc}\% AUROC with \res{att_convkan_proposed}{params_m}\,M parameters and \res{att_convkan_proposed}{gflops}\,GFLOPs. Against its own backbone with the native MLP head (MobileNetV3-S: \res{mobilenetv3_small}{macro_f1}\% macro-F1, \res{mobilenetv3_small}{auroc}\% AUROC) the paired bootstrap difference is \res{paired@mobilenetv3_small}{delta_macro_f1} macro-F1 points (95\% CI [\res{paired@mobilenetv3_small}{delta_macro_f1_ci_lower}, \res{paired@mobilenetv3_small}{delta_macro_f1_ci_upper}], $p\res{paired@mobilenetv3_small}{p_value}$), i.e.\ not significant at this budget.
+
+The larger baselines are clearly stronger. The best baseline, \bestbaselinename, attains \res{derived}{best_baseline_f1}\% macro-F1, \res{derived}{f1_gap_to_best_baseline} points above \ours\ (paired $p\bestbaselinep$), but requires \res{derived}{param_ratio_best_baseline}$\times$ more parameters and \res{derived}{gflops_ratio_best_baseline}$\times$ more FLOPs. Fig.~\ref{fig:pareto} places all models in the accuracy--cost plane. The low-cost end of the Pareto frontier is formed by the MobileNetV3-S variants, but \ours\ itself lies just off it: the backbone + MLP-head ablation is marginally smaller and slightly (not significantly) better. The remaining frontier points are ViT-Tiny and DenseNet-121. Under a short training budget the KAN components therefore do not close the gap to models with 3.5--17.5$\times$ more parameters; they change the composition and interpretability of the lightweight model, not its accuracy class.
+
+Two efficiency observations temper the parameter savings. First, the KAN head is smaller than the MLP head it replaces (\res{att_convkan_proposed}{head_params_k}\,K vs.\ \res{mobilenetv3_small}{head_params_k}\,K parameters, a \res{derived}{head_reduction_pct}\% reduction), but the KANConv bottleneck and attention add parameters elsewhere, so the full model is slightly \emph{larger} than MobileNetV3-S (\res{att_convkan_proposed}{params_m}\,M vs.\ \res{mobilenetv3_small}{params_m}\,M). Second, the B-spline recursion is element-wise work that dense-FLOP counts understate: on our CPU the single-image latency of \ours\ is \res{att_convkan_proposed}{latency_ms}\,ms versus \res{mobilenetv3_small}{latency_ms}\,ms for MobileNetV3-S, and its batched throughput is \res{att_convkan_proposed}{throughput_img_s} vs.\ \res{mobilenetv3_small}{throughput_img_s} images/s. On this CPU, \ours\ is even slower per image than ViT-Tiny (\res{vit_tiny}{latency_ms}\,ms), although ViT-Tiny needs \res{vit_tiny}{gflops}\,GFLOPs versus \res{att_convkan_proposed}{gflops}; FLOPs are a poor proxy for KAN latency.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.74\textwidth]{fig5_pareto_efficiency.pdf}
+\caption{Accuracy--efficiency trade-off on the DermaMNIST test set. Bubble area is proportional to GFLOPs; the dashed line connects Pareto-optimal models (higher macro-F1 at lower cost).}
+\label{fig:pareto}
+\end{figure*}
+
+\input{../results/tables/table2_ablation_study.tex}
+
+\subsection{Ablation study}
+Table~\ref{tab:ablation} isolates each component on the same backbone, data, budget and seed. Replacing the MLP head by the regularised KAN head (row~2) raises macro-F1 from \res{ablation_1_backbone_mlp}{macro_f1}\% to \res{ablation_2_backbone_kan_no_att}{macro_f1}\% and gives the highest AUROC of the family (\res{ablation_2_backbone_kan_no_att}{auroc}\%) with \res{derived}{head_reduction_pct}\% fewer head parameters. Adding attention to the MLP head (row~3) raises balanced accuracy (\res{ablation_3_backbone_att_mlp}{balanced_accuracy}\% vs.\ \res{ablation_1_backbone_mlp}{balanced_accuracy}\%) and lowers ECE, but not macro-F1. The full architecture without spline regularisation (row~4) obtains the highest balanced accuracy (\res{ablation_4_full_no_spline_reg}{balanced_accuracy}\%) and macro-F1 (\res{ablation_4_full_no_spline_reg}{macro_f1}\%) of the lightweight family.
+
+The spline regulariser is the component with the clearest effect, and it is a trade-off. With $\lambda_1=1$, $\lambda_H=0.1$ the L1 and entropy terms drive almost all spline coefficients to zero: \res{att_convkan_proposed}{kan_edge_sparsity_pct}\% of the head's \res{att_convkan_proposed}{kan_head_edges_k}\,K edges reduce to the purely symbolic form $w_b\,\mathrm{SiLU}(x)$ and the normalised edge entropy falls to $H=\res{att_convkan_proposed}{kan_spline_entropy}$, versus \res{ablation_4_full_no_spline_reg}{kan_edge_sparsity_pct}\% and $H=\res{ablation_4_full_no_spline_reg}{kan_spline_entropy}$ without regularisation. The price is \res{paired@ablation_4_full_no_spline_reg}{delta_macro_f1} macro-F1 points relative to row~4 (paired 95\% CI [\res{paired@ablation_4_full_no_spline_reg}{delta_macro_f1_ci_lower}, \res{paired@ablation_4_full_no_spline_reg}{delta_macro_f1_ci_upper}], $p\res{paired@ablation_4_full_no_spline_reg}{p_value}$). Because Adam normalises each parameter's step, even a weak regularisation gradient moves an unused coefficient by roughly the learning rate per step, so the strength of the sparsity pressure is governed less by $\lambda$ than by whether an edge receives any data gradient; selecting $\lambda_1,\lambda_H$ on the validation set is therefore necessary and is left to future work. None of the differences between the full model and its ablations is significant under the paired bootstrap ($p\ge\res{derived}{min_ablation_p}$), so with a single seed and ten epochs they should be read as trends.
+
+\input{../results/tables/table3_per_class_metrics.tex}
+
+\subsection{Per-class behaviour and calibration}
+Table~\ref{tab:perclass} reports per-class results of \ours. The majority class \texttt{nv} reaches \res{att_convkan_proposed}{nv_f1}\% F1, and the rare vascular lesions \res{att_convkan_proposed}{vasc_recall}\% recall. Melanoma is the hardest class to detect (\res{att_convkan_proposed}{mel_recall}\% recall, \res{att_convkan_proposed}{mel_f1}\% F1); it has the lowest recall of all classes for eight of the ten models, and even \bestbaselinename\ reaches only \res{derived}{best_baseline_mel_recall}\%. Its AUROC of \res{att_convkan_proposed}{mel_auroc}\% shows that the ranking is informative but the decision threshold, shaped by the class weights, favours \texttt{nv}. Fig.~\ref{fig:roc} shows the per-class ROC and precision-recall curves and Fig.~\ref{fig:cm} the confusions, which are dominated by \texttt{mel}$\leftrightarrow$\texttt{nv}, followed by \texttt{nv}$\leftrightarrow$\texttt{bkl}.
+
+All models are markedly \emph{under-confident} (ECE \res{att_convkan_proposed}{ece}\% for \ours), a known side effect of focal loss and class re-weighting. Temperature scaling fitted on the validation set ($T=\res{att_convkan_proposed}{temperature}$) reduces the ECE of \ours\ to \res{att_convkan_proposed}{ece_temperature_scaled}\% without changing its predictions. Split-conformal prediction sets calibrated at $\alpha=0.1$ achieve \res{att_convkan_proposed}{conformal_coverage}\% empirical coverage with \res{att_convkan_proposed}{conformal_set_size} labels per image on average, which is a practical way to flag ambiguous lesions for review.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.66\textwidth]{fig3_roc_and_pr_curves.pdf}
+\caption{Per-class and macro-average ROC (left) and precision-recall (right) curves of \ours\ on the test set; AUC and average precision in the legends.}
+\label{fig:roc}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.56\textwidth]{fig4_confusion_matrix.pdf}
+\caption{Row-normalised confusion matrices of \ours\ and the best baseline (\bestbaselinename) on the test set.}
+\label{fig:cm}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.7\textwidth]{fig6_training_dynamics.pdf}
+\caption{Training dynamics: training (dashed) and validation (solid) loss, validation macro-F1 and validation AUROC per epoch.}
+\label{fig:dynamics}
+\end{figure*}
+
+\textbf{Training dynamics.} Fig.~\ref{fig:dynamics} shows that validation macro-F1 is still rising at the end of the ten-epoch budget for most models (the best epoch of \ours\ is \res{att_convkan_proposed}{best_epoch}), so all numbers in this paper are lower bounds on what each architecture reaches with full training.
+
+\section{Explainability Analysis}
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig1_gradcam_comparison.pdf}
+\caption{Qualitative explanations on four test images (three confident correct predictions of different classes and the most confident misclassified non-nevus lesion). For each image: input with ground truth (GT) and prediction of \ours; its coordinate-channel attention; its Grad-CAM++; Grad-CAM++ of the best baseline.}
+\label{fig:gradcam}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2b_learned_kan_splines_output.pdf}
+\caption{Learned edge functions $\phi_{c,i}(x)$ of the output \texttt{KANLinear} layer of \ours\ (top-12 edges by spline importance; subscripts give the target class and the input unit). Solid: total activation; dashed: SiLU residual; dotted: B-spline component; ticks: adapted knots; $\overline{|c|}$: mean absolute spline coefficient.}
+\label{fig:splines}
+\end{figure*}
+
+\textbf{Spatial explanations.} Fig.~\ref{fig:gradcam} compares the attention map and Grad-CAM++ of \ours\ with Grad-CAM++ of the best baseline. At $128\times128$ input the last feature maps of both MobileNetV3 and \bestbaselinename\ are only $4\times4$, so all saliency maps are coarse. The Grad-CAM++ maps of \ours\ cover the lesion in the shown examples, and its attention masks are diffuse, acting mainly by down-weighting the image corners and borders (where vignetting and ruler artefacts occur) rather than by delineating the lesion; neither resolves lesion borders or individual dermoscopic structures. The misclassified example (a basal cell carcinoma predicted as dermatofibroma) is misclassified in the same way by \bestbaselinename, with a similarly placed saliency map. Higher input resolution (the $224\times224$ default configuration) or an earlier, higher-resolution feature level would be needed for clinically useful localisation.
+
+\textbf{Functional explanations.} The distinctive property of a KAN is that the mapping from features to class scores can be read off directly. Fig.~\ref{fig:splines} plots the most important learned edges of the output layer. Consistent with the statistics in Table~\ref{tab:ablation}, the regularised head is almost entirely \emph{symbolic}: nearly every edge is a scaled SiLU, which can be written in closed form, and the spline capacity is concentrated on very few edges with non-monotone shapes (the top edge, feeding the melanoma logit, has two local minima). This yields a compact description of the classifier, i.e.\ a sum of SiLU terms plus a handful of tabulated univariate functions, which an MLP head cannot provide. The repository additionally plots the first head layer and the unregularised model (ablation~4), whose spline components are spread across many edges, and a per-image script (\texttt{inference\_demo.py}) that marks the actual input value on each contributing edge.
+
+\section{Limitations}
+The study uses a single seed, a ten-epoch budget, $128\times128$ inputs and CPU-only training; most models had not converged, so absolute numbers are below published DermaMNIST results at $224\times224$ and differences of a few points are within noise (paired $p>0.05$ for all ablations). The spline-regularisation weights were not tuned, and the observed collapse indicates that they should be. Latency was measured on one CPU; the relative cost of the B-spline recursion will differ on GPUs.
+
+\section{Conclusion}
+We presented \ours, a lightweight hybrid of a pretrained MobileNetV3-S backbone, a depthwise KANConv bottleneck, coordinate-channel attention and a B-spline KAN classification head, together with a pure-PyTorch KAN implementation and a fully reproducible benchmark. Under an identical short training budget on DermaMNIST, \ours\ performs on par with its MobileNetV3-S baseline (\res{att_convkan_proposed}{macro_f1}\% vs.\ \res{mobilenetv3_small}{macro_f1}\% macro-F1) while replacing a \res{mobilenetv3_small}{head_params_k}\,K-parameter MLP head by a \res{att_convkan_proposed}{head_params_k}\,K-parameter KAN head whose decision function is \res{att_convkan_proposed}{kan_edge_sparsity_pct}\% symbolic. The KAN head improved on the MLP head with fewer parameters, the full architecture without spline regularisation gave the best lightweight macro-F1, and spline regularisation traded \res{derived}{reg_cost_f1} macro-F1 points for interpretability. On CPU the spline evaluation raises single-image latency from \res{mobilenetv3_small}{latency_ms} to \res{att_convkan_proposed}{latency_ms}\,ms, so FLOP counts overstate the efficiency of KAN layers. Larger baselines, led by \bestbaselinename\ at \res{derived}{param_ratio_best_baseline}$\times$ the parameter count, remain clearly more accurate. Future work will tune the regularisation on validation data, train at full resolution and length with multiple seeds, and test whether KAN heads help on other MedMNIST tasks.
+
+
+
+\begin{thebibliography}{99}
+\footnotesize
+\bibitem{esteva2017dermatologist} A.~Esteva, B.~Kuprel, R.~A. Novoa, J.~Ko, S.~M. Swetter, H.~M. Blau, and S.~Thrun, ``Dermatologist-level classification of skin cancer with deep neural networks,'' \emph{Nature}, vol.~542, no.~7639, pp.~115--118, 2017.
+\bibitem{codella2019isic} N.~Codella, V.~Rotemberg, P.~Tschandl, M.~E. Celebi, S.~Dusza, D.~Gutman, B.~Helba, A.~Kalloo, K.~Liopyris, M.~Marchetti, H.~Kittler, and A.~Halpern, ``Skin lesion analysis toward melanoma detection 2018: A challenge hosted by the International Skin Imaging Collaboration (ISIC),'' \emph{arXiv:1902.03368}, 2019.
+\bibitem{tschandl2018ham10000} P.~Tschandl, C.~Rosendahl, and H.~Kittler, ``The HAM10000 dataset, a large collection of multi-source dermatoscopic images of common pigmented skin lesions,'' \emph{Scientific Data}, vol.~5, art.~180161, 2018.
+\bibitem{yang2023medmnist} J.~Yang, R.~Shi, D.~Wei, Z.~Liu, L.~Zhao, B.~Ke, H.~Pfister, and B.~Ni, ``MedMNIST v2 -- A large-scale lightweight benchmark for 2D and 3D biomedical image classification,'' \emph{Scientific Data}, vol.~10, art.~41, 2023.
+\bibitem{liu2025kan} Z.~Liu, Y.~Wang, S.~Vaidya, F.~Ruehle, J.~Halverson, M.~Solja\v{c}i\'{c}, T.~Y. Hou, and M.~Tegmark, ``KAN: Kolmogorov-Arnold networks,'' in \emph{Proc. Int. Conf. Learn. Represent. (ICLR)}, 2025.
+\bibitem{liu2024kan2} Z.~Liu, P.~Ma, Y.~Wang, W.~Matusik, and M.~Tegmark, ``KAN 2.0: Kolmogorov-Arnold networks meet science,'' \emph{arXiv:2408.10205}, 2024.
+\bibitem{kolmogorov1957} A.~N. Kolmogorov, ``On the representation of continuous functions of many variables by superposition of continuous functions of one variable and addition,'' \emph{Doklady Akademii Nauk SSSR}, vol.~114, no.~5, pp.~953--956, 1957.
+\bibitem{deboor1978splines} C.~de~Boor, \emph{A Practical Guide to Splines}. New York, NY, USA: Springer-Verlag, 1978.
+\bibitem{bodner2024convkan} A.~D. Bodner, A.~S. Tepsich, J.~N. Spolski, and S.~Pourteau, ``Convolutional Kolmogorov-Arnold networks,'' \emph{arXiv:2406.13155}, 2024.
+\bibitem{drokin2024kanconv} I.~Drokin, ``Kolmogorov-Arnold convolutions: Design principles and empirical studies,'' \emph{arXiv:2407.01092}, 2024.
+\bibitem{yang2025kat} X.~Yang and X.~Wang, ``Kolmogorov-Arnold transformer,'' in \emph{Proc. Int. Conf. Learn. Represent. (ICLR)}, 2025.
+\bibitem{li2025ukan} C.~Li, X.~Liu, W.~Li, C.~Wang, H.~Liu, Y.~Liu, Z.~Chen, and Y.~Yuan, ``U-KAN makes strong backbones for medical image segmentation and generation,'' in \emph{Proc. AAAI Conf. Artif. Intell.}, vol.~39, 2025, pp.~4652--4660.
+\bibitem{li2024fastkan} Z.~Li, ``Kolmogorov-Arnold networks are radial basis function networks,'' \emph{arXiv:2405.06721}, 2024.
+\bibitem{bozorgasl2024wavkan} Z.~Bozorgasl and H.~Chen, ``Wav-KAN: Wavelet Kolmogorov-Arnold networks,'' \emph{arXiv:2405.12832}, 2024.
+\bibitem{he2016resnet} K.~He, X.~Zhang, S.~Ren, and J.~Sun, ``Deep residual learning for image recognition,'' in \emph{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2016, pp.~770--778.
+\bibitem{huang2017densenet} G.~Huang, Z.~Liu, L.~van~der~Maaten, and K.~Q. Weinberger, ``Densely connected convolutional networks,'' in \emph{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2017, pp.~4700--4708.
+\bibitem{howard2019mobilenetv3} A.~Howard, M.~Sandler, G.~Chu, L.-C. Chen, B.~Chen, M.~Tan, W.~Wang, Y.~Zhu, R.~Pang, V.~Vasudevan, Q.~V. Le, and H.~Adam, ``Searching for MobileNetV3,'' in \emph{Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV)}, 2019, pp.~1314--1324.
+\bibitem{dosovitskiy2021vit} A.~Dosovitskiy, L.~Beyer, A.~Kolesnikov, D.~Weissenborn, X.~Zhai, T.~Unterthiner, M.~Dehghani, M.~Minderer, G.~Heigold, S.~Gelly, J.~Uszkoreit, and N.~Houlsby, ``An image is worth 16x16 words: Transformers for image recognition at scale,'' in \emph{Proc. Int. Conf. Learn. Represent. (ICLR)}, 2021.
+\bibitem{liu2022convnext} Z.~Liu, H.~Mao, C.-Y. Wu, C.~Feichtenhofer, T.~Darrell, and S.~Xie, ``A ConvNet for the 2020s,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2022, pp.~11976--11986.
+\bibitem{hu2018senet} J.~Hu, L.~Shen, and G.~Sun, ``Squeeze-and-excitation networks,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2018, pp.~7132--7141.
+\bibitem{woo2018cbam} S.~Woo, J.~Park, J.-Y. Lee, and I.~S. Kweon, ``CBAM: Convolutional block attention module,'' in \emph{Proc. Eur. Conf. Comput. Vis. (ECCV)}, 2018, pp.~3--19.
+\bibitem{hou2021coordatt} Q.~Hou, D.~Zhou, and J.~Feng, ``Coordinate attention for efficient mobile network design,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2021, pp.~13713--13722.
+\bibitem{lin2017focal} T.-Y. Lin, P.~Goyal, R.~Girshick, K.~He, and P.~Doll\'{a}r, ``Focal loss for dense object detection,'' in \emph{Proc. IEEE Int. Conf. Comput. Vis. (ICCV)}, 2017, pp.~2980--2988.
+\bibitem{cui2019classbalanced} Y.~Cui, M.~Jia, T.-Y. Lin, Y.~Song, and S.~Belongie, ``Class-balanced loss based on effective number of samples,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2019, pp.~9268--9277.
+\bibitem{selvaraju2017gradcam} R.~R. Selvaraju, M.~Cogswell, A.~Das, R.~Vedantam, D.~Parikh, and D.~Batra, ``Grad-CAM: Visual explanations from deep networks via gradient-based localization,'' in \emph{Proc. IEEE Int. Conf. Comput. Vis. (ICCV)}, 2017, pp.~618--626.
+\bibitem{chattopadhay2018gradcampp} A.~Chattopadhay, A.~Sarkar, P.~Howlader, and V.~N. Balasubramanian, ``Grad-CAM++: Generalized gradient-based visual explanations for deep convolutional networks,'' in \emph{Proc. IEEE Winter Conf. Appl. Comput. Vis. (WACV)}, 2018, pp.~839--847.
+\bibitem{guo2017calibration} C.~Guo, G.~Pleiss, Y.~Sun, and K.~Q. Weinberger, ``On calibration of modern neural networks,'' in \emph{Proc. Int. Conf. Mach. Learn. (ICML)}, 2017, pp.~1321--1330.
+\bibitem{angelopoulos2021gentle} A.~N. Angelopoulos and S.~Bates, ``A gentle introduction to conformal prediction and distribution-free uncertainty quantification,'' \emph{arXiv:2107.07511}, 2021.
+\bibitem{loshchilov2017sgdr} I.~Loshchilov and F.~Hutter, ``SGDR: Stochastic gradient descent with warm restarts,'' in \emph{Proc. Int. Conf. Learn. Represent. (ICLR)}, 2017.
+\bibitem{loshchilov2019adamw} I.~Loshchilov and F.~Hutter, ``Decoupled weight decay regularization,'' in \emph{Proc. Int. Conf. Learn. Represent. (ICLR)}, 2019.
+\bibitem{zhang2018mixup} H.~Zhang, M.~Cisse, Y.~N. Dauphin, and D.~Lopez-Paz, ``mixup: Beyond empirical risk minimization,'' in \emph{Proc. Int. Conf. Learn. Represent. (ICLR)}, 2018.
+\bibitem{yun2019cutmix} S.~Yun, D.~Han, S.~J. Oh, S.~Chun, J.~Choe, and Y.~Yoo, ``CutMix: Regularization strategy to train strong classifiers with localizable features,'' in \emph{Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV)}, 2019, pp.~6023--6032.
+\end{thebibliography}
+
+\end{document}

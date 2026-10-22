@@ -167,8 +167,12 @@
   "lambda_l1": 1.0,
   "lambda_ent": 0.1,
   "kan_head_edges": 37312.0,
-  "kan_edge_sparsity": 0.9999463979416809,
+  "kan_edge_sparsity": 0.9998659948542024,
   "kan_spline_entropy": 0.0005754955345764756,
   "kan_head_mean_l1": 0.0004991068126400933,
-  "kan_conv_mean_l1": 0.0008897456573322415
+  "kan_conv_mean_l1": 0.0008897456573322415,
+  "temperature": 0.5283530482869379,
+  "ece_temperature_scaled": 2.3018103352928936,
+  "kan_top_mass": 1.0,
+  "post_hoc_version": 1
 }

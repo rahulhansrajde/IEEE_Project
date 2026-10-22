@@ -1,0 +1,71 @@
+model,display_name,class,precision,recall,f1,specificity,auroc,support
+att_convkan_proposed,Att-ConvKAN (Ours),akiec,50.0000,60.6061,54.7945,97.9371,95.2365,66
+att_convkan_proposed,Att-ConvKAN (Ours),bcc,60.7477,63.1068,61.9048,97.7918,96.8592,103
+att_convkan_proposed,Att-ConvKAN (Ours),bkl,57.7406,62.7273,60.1307,94.3417,91.4380,220
+att_convkan_proposed,Att-ConvKAN (Ours),df,38.4615,65.2174,48.3871,98.7891,99.0348,23
+att_convkan_proposed,Att-ConvKAN (Ours),mel,55.9322,44.3946,49.5000,95.6229,87.1530,223
+att_convkan_proposed,Att-ConvKAN (Ours),nv,90.7100,89.5600,90.1313,81.4759,93.9792,1341
+att_convkan_proposed,Att-ConvKAN (Ours),vasc,66.6667,89.6552,76.4706,99.3421,97.3353,29
+resnet50,ResNet-50,akiec,62.6667,71.2121,66.6667,98.5560,97.2065,66
+resnet50,ResNet-50,bcc,66.9421,78.6408,72.3214,97.8970,98.0787,103
+resnet50,ResNet-50,bkl,63.5593,68.1818,65.7895,95.1821,94.1179,220
+resnet50,ResNet-50,df,66.6667,69.5652,68.0851,99.5964,94.4369,23
+resnet50,ResNet-50,mel,58.5227,46.1883,51.6291,95.9035,89.9093,223
+resnet50,ResNet-50,nv,91.5419,91.2006,91.3709,82.9819,95.6770,1341
+resnet50,ResNet-50,vasc,78.3784,100.0000,87.8788,99.5951,99.9529,29
+densenet121,DenseNet-121,akiec,60.2941,62.1212,61.1940,98.6075,95.0896,66
+densenet121,DenseNet-121,bcc,75.9259,79.6117,77.7251,98.6330,98.1736,103
+densenet121,DenseNet-121,bkl,66.9528,70.9091,68.8742,95.6863,95.5322,220
+densenet121,DenseNet-121,df,69.5652,69.5652,69.5652,99.6468,99.6863,23
+densenet121,DenseNet-121,mel,61.8852,67.7130,64.6681,94.7811,92.6663,223
+densenet121,DenseNet-121,nv,94.0724,91.1260,92.5758,88.4036,96.5386,1341
+densenet121,DenseNet-121,vasc,90.0000,93.1034,91.5254,99.8482,99.9093,29
+mobilenetv3_small,MobileNetV3-S,akiec,40.3846,63.6364,49.4118,96.8025,96.3352,66
+mobilenetv3_small,MobileNetV3-S,bcc,54.3478,72.8155,62.2407,96.6877,97.0869,103
+mobilenetv3_small,MobileNetV3-S,bkl,55.1724,50.9091,52.9551,94.9020,89.2343,220
+mobilenetv3_small,MobileNetV3-S,df,38.2353,56.5217,45.6140,98.9405,96.0887,23
+mobilenetv3_small,MobileNetV3-S,mel,52.3316,45.2915,48.5577,94.8373,86.6800,223
+mobilenetv3_small,MobileNetV3-S,nv,91.0632,88.1432,89.5794,82.5301,93.8027,1341
+mobilenetv3_small,MobileNetV3-S,vasc,80.0000,96.5517,87.5000,99.6457,99.1048,29
+vit_tiny,ViT-Tiny,akiec,55.9524,71.2121,62.6667,98.0918,97.8472,66
+vit_tiny,ViT-Tiny,bcc,70.0000,74.7573,72.3005,98.2650,97.6453,103
+vit_tiny,ViT-Tiny,bkl,66.5158,66.8182,66.6667,95.8543,93.6443,220
+vit_tiny,ViT-Tiny,df,61.7647,91.3043,73.6842,99.3441,99.6885,23
+vit_tiny,ViT-Tiny,mel,60.5381,60.5381,60.5381,95.0617,91.1804,223
+vit_tiny,ViT-Tiny,nv,93.0769,90.2312,91.6320,86.4458,95.8482,1341
+vit_tiny,ViT-Tiny,vasc,87.8788,100.0000,93.5484,99.7976,99.9791,29
+convnext_tiny,ConvNeXt-T,akiec,57.6471,74.2424,64.9007,98.1434,96.8189,66
+convnext_tiny,ConvNeXt-T,bcc,73.7288,84.4660,78.7330,98.3701,99.0189,103
+convnext_tiny,ConvNeXt-T,bkl,62.3482,70.0000,65.9529,94.7899,93.8464,220
+convnext_tiny,ConvNeXt-T,df,57.6923,65.2174,61.2245,99.4450,99.3331,23
+convnext_tiny,ConvNeXt-T,mel,62.1053,52.9148,57.1429,95.9596,90.3638,223
+convnext_tiny,ConvNeXt-T,nv,92.2546,89.7092,90.9641,84.7892,95.5672,1341
+convnext_tiny,ConvNeXt-T,vasc,80.0000,96.5517,87.5000,99.6457,99.9075,29
+ablation_1_backbone_mlp,Backbone + MLP head,akiec,43.0108,60.6061,50.3145,97.2666,96.2125,66
+ablation_1_backbone_mlp,Backbone + MLP head,bcc,58.9552,76.6990,66.6667,97.1083,97.6412,103
+ablation_1_backbone_mlp,Backbone + MLP head,bkl,61.5000,55.9091,58.5714,95.6863,90.3216,220
+ablation_1_backbone_mlp,Backbone + MLP head,df,50.0000,69.5652,58.1818,99.1927,97.6001,23
+ablation_1_backbone_mlp,Backbone + MLP head,mel,57.6923,40.3587,47.4934,96.2963,86.9107,223
+ablation_1_backbone_mlp,Backbone + MLP head,nv,89.7417,90.6786,90.2077,79.0663,94.3348,1341
+ablation_1_backbone_mlp,Backbone + MLP head,vasc,74.2857,89.6552,81.2500,99.5445,99.5637,29
+ablation_2_backbone_kan_no_att,Backbone + KAN head,akiec,44.8276,59.0909,50.9804,97.5245,95.6421,66
+ablation_2_backbone_kan_no_att,Backbone + KAN head,bcc,60.0000,75.7282,66.9528,97.2660,97.6601,103
+ablation_2_backbone_kan_no_att,Backbone + KAN head,bkl,60.7656,57.7273,59.2075,95.4062,91.3351,220
+ablation_2_backbone_kan_no_att,Backbone + KAN head,df,48.3871,65.2174,55.5556,99.1927,98.2297,23
+ablation_2_backbone_kan_no_att,Backbone + KAN head,mel,51.8828,55.6054,53.6797,93.5466,89.0394,223
+ablation_2_backbone_kan_no_att,Backbone + KAN head,nv,92.3922,87.8449,90.0612,85.3916,94.5300,1341
+ablation_2_backbone_kan_no_att,Backbone + KAN head,vasc,76.4706,89.6552,82.5397,99.5951,99.9058,29
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,akiec,46.0000,69.6970,55.4217,97.2151,96.5641,66
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,bcc,57.3770,67.9612,62.2222,97.2660,96.8715,103
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,bkl,59.8039,55.4545,57.5472,95.4062,90.7087,220
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,df,30.6452,82.6087,44.7059,97.8305,98.9295,23
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,mel,53.7975,38.1166,44.6194,95.9035,86.7338,223
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,nv,90.4151,89.3363,89.8725,80.8735,93.5891,1341
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,vasc,79.4118,93.1034,85.7143,99.6457,99.6911,29
+ablation_4_full_no_spline_reg,Full w/o spline reg.,akiec,43.9024,54.5455,48.6486,97.6276,95.3780,66
+ablation_4_full_no_spline_reg,Full w/o spline reg.,bcc,56.6176,74.7573,64.4351,96.8980,97.4217,103
+ablation_4_full_no_spline_reg,Full w/o spline reg.,bkl,58.2222,59.5455,58.8764,94.7339,91.3850,220
+ablation_4_full_no_spline_reg,Full w/o spline reg.,df,65.3846,73.9130,69.3878,99.5459,98.8922,23
+ablation_4_full_no_spline_reg,Full w/o spline reg.,mel,50.0000,56.0538,52.8541,92.9854,87.6244,223
+ablation_4_full_no_spline_reg,Full w/o spline reg.,nv,92.8514,86.2043,89.4045,86.5964,94.2203,1341
+ablation_4_full_no_spline_reg,Full w/o spline reg.,vasc,68.2927,96.5517,80.0000,99.3421,99.9005,29

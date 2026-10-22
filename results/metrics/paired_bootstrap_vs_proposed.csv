@@ -1,0 +1,10 @@
+model,display_name,delta_macro_f1,delta_macro_f1_ci_lower,delta_macro_f1_ci_upper,delta_balanced_accuracy,delta_balanced_accuracy_ci_lower,delta_balanced_accuracy_ci_upper,p_value
+resnet50,ResNet-50,-8.9175,-12.7919,-5.1534,-7.1031,-10.9964,-3.0739,0.0000
+densenet121,DenseNet-121,-12.1155,-15.7355,-8.5318,-8.4118,-12.4237,-4.4314,0.0000
+mobilenetv3_small,MobileNetV3-S,0.7801,-2.2433,3.7773,0.1997,-3.1120,3.4862,0.6330
+vit_tiny,ViT-Tiny,-11.3882,-14.9635,-7.9220,-11.3706,-15.4738,-7.1754,0.0000
+convnext_tiny,ConvNeXt-T,-9.2999,-12.7736,-5.8030,-8.2620,-12.3145,-4.2682,0.0000
+ablation_1_backbone_mlp,Backbone + MLP head,-1.6238,-5.0777,2.1968,-1.1721,-5.3486,3.0628,0.3740
+ablation_2_backbone_kan_no_att,Backbone + KAN head,-2.5225,-5.8613,0.9284,-2.2288,-6.3051,1.8206,0.1620
+ablation_3_backbone_att_mlp,Backbone + Att. + MLP head,0.1737,-3.0552,3.4282,-3.0015,-6.8717,0.9080,0.9380
+ablation_4_full_no_spline_reg,Full w/o spline reg.,-3.1839,-6.6285,0.2902,-3.7577,-8.0165,0.4532,0.0760

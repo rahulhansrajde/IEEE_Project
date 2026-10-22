@@ -275,7 +275,7 @@ def make_macros(summary: pd.DataFrame, per_class: Optional[pd.DataFrame] = None,
         if base:
             best = max(base, key=lambda m: idx.loc[m, "macro_f1"])
             derived["best_baseline_f1"] = idx.loc[best, "macro_f1"]
-            derived["f1_gap_to_best_baseline"] = prop["macro_f1"] - idx.loc[best, "macro_f1"]
+            derived["f1_gap_to_best_baseline"] = idx.loc[best, "macro_f1"] - prop["macro_f1"]
             derived["param_ratio_best_baseline"] = idx.loc[best, "params_m"] / prop["params_m"]
             derived["gflops_ratio_best_baseline"] = idx.loc[best, "gflops"] / prop["gflops"]
             lines.append(rf"\def\bestbaselinename{{{_latex_escape(MODEL_SPECS[best].display_name)}}}")

@@ -1,0 +1,17 @@
+{
+  "params_m": 27.825511,
+  "params_total": 27825511.0,
+  "head_params_k": 6.919,
+  "head_params": 6919.0,
+  "model_size_mb": 106.20985698699951,
+  "gflops": 2.909243904,
+  "gmacs": 1.454621952,
+  "kan_basis_mflops": 0.0,
+  "latency_ms": 52.10906219482422,
+  "latency_std_ms": 6.508772373199463,
+  "latency_median_ms": 53.51495361328125,
+  "throughput_img_s": 52.892981219357786,
+  "device": "cpu",
+  "num_threads": 4,
+  "checkpoint_file_mb": 106.21292781829834
+}

@@ -171,5 +171,8 @@
   "kan_top_mass": 0.20549002289772034,
   "kan_spline_entropy": 0.8583036065101624,
   "kan_head_mean_l1": 0.003002048237249255,
-  "kan_conv_mean_l1": 0.005903488490730524
+  "kan_conv_mean_l1": 0.005903488490730524,
+  "temperature": 0.5416934890578194,
+  "ece_temperature_scaled": 2.218441578929017,
+  "post_hoc_version": 1
 }

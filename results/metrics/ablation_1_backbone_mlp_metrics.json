@@ -165,5 +165,8 @@
   "image_size": 128,
   "spline_regularization": false,
   "lambda_l1": 0.0,
-  "lambda_ent": 0.0
+  "lambda_ent": 0.0,
+  "temperature": 0.5066343106351303,
+  "ece_temperature_scaled": 2.452094640620204,
+  "post_hoc_version": 1
 }

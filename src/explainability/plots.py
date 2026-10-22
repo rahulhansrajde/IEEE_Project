@@ -140,7 +140,7 @@ def plot_confusion_matrices(
     n = len(matrices)
     fig, axes = plt.subplots(1, n, figsize=(min(IEEE_DOUBLE_COL, 3.5 * n), 3.1), squeeze=False)
     im = None
-    for ax, (name, cm) in zip(axes[0], matrices.items()):
+    for k, (ax, (name, cm)) in enumerate(zip(axes[0], matrices.items())):
         cm = np.asarray(cm, dtype=np.float64)
         norm = cm / np.maximum(cm.sum(axis=1, keepdims=True), 1)
         im = ax.imshow(norm, cmap="Blues", vmin=0, vmax=1)
@@ -152,7 +152,8 @@ def plot_confusion_matrices(
         ax.set_xticks(range(len(class_names)), class_names, rotation=45, ha="right")
         ax.set_yticks(range(len(class_names)), class_names)
         ax.set_xlabel("Predicted label")
-        ax.set_ylabel("True label")
+        if k == 0:
+            ax.set_ylabel("True label")
         ax.set_title(name)
         for spine in ax.spines.values():
             spine.set_visible(False)
@@ -218,19 +219,30 @@ def plot_pareto_efficiency(
                 frontier.append(i)
                 best = y[i]
         ax.plot(x[frontier], y[frontier], color=NEUTRAL, lw=0.8, ls="--", zorder=1, label="Pareto frontier")
+        logx = np.log10(x)
         for i, r in enumerate(rows):
             is_ours = highlight is not None and r.get("model") == highlight
             color = PALETTE[1] if is_ours else PALETTE[0] if r.get("family") == "baseline" else PALETTE[2]
-            ax.scatter(x[i], y[i], s=sizes[i], color=color, alpha=0.75, edgecolors="white", linewidths=1.5,
-                       marker="*" if is_ours else "o", zorder=3)
-            # Alternate label offsets so that neighbouring points stay legible.
-            offset = (6, 6) if i % 2 == 0 else (6, -10)
-            ax.annotate(r["display_name"], (x[i], y[i]), textcoords="offset points", xytext=offset,
-                        fontsize=6, color="#111111", fontweight="bold" if is_ours else "normal")
+            size = max(sizes[i], 220.0) if is_ours else sizes[i]
+            ax.scatter(x[i], y[i], s=size, color=color, alpha=0.95 if is_ours else 0.7, edgecolors="white",
+                       linewidths=1.2, marker="*" if is_ours else "o", zorder=4 if is_ours else 3)
+            # Place the label right of the bubble unless another point sits close on that side.
+            radius = np.sqrt(size / np.pi) + 3
+            crowded_right = any(
+                j != i and 0 < logx[j] - logx[i] < 0.35 and abs(y[j] - y[i]) < 2.0 for j in range(len(rows))
+            )
+            same_x = [j for j in range(len(rows)) if j != i and abs(logx[j] - logx[i]) < 0.05]
+            dy = 0.0
+            if same_x:
+                dy = 7.0 if y[i] >= max(y[j] for j in same_x) else -7.0 if y[i] <= min(y[j] for j in same_x) else 0.0
+            ax.annotate(r["display_name"], (x[i], y[i]), textcoords="offset points",
+                        xytext=(-radius if crowded_right else radius, dy), ha="right" if crowded_right else "left",
+                        va="center", fontsize=6, color="#111111", fontweight="bold" if is_ours else "normal",
+                        zorder=5)
         ax.set_xscale("log")
         ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
         ax.xaxis.set_minor_formatter(NullFormatter())
-        ax.set_xlim(x.min() / 1.6, x.max() * 2.2)
+        ax.set_xlim(x.min() / 4.5, x.max() * 2.2)
         ax.set_xlabel(xlabel)
         ax.set_ylabel("Test macro-F1 (%)")
         pad = (y.max() - y.min()) * 0.15 + 0.5
@@ -241,7 +253,7 @@ def plot_pareto_efficiency(
         plt.Line2D([], [], marker="*", ls="", color=PALETTE[1], markersize=9, label="Att-ConvKAN (ours)"),
         plt.Line2D([], [], color=NEUTRAL, ls="--", label="Pareto frontier"),
     ]
-    axes[0].legend(handles=handles, loc="lower right")
+    axes[0].legend(handles=handles, loc="upper left")
     axes[0].set_title("(a) Accuracy-parameter trade-off (bubble area $\\propto$ GFLOPs)")
     axes[1].set_title("(b) Accuracy-storage trade-off")
     fig.tight_layout()
@@ -273,6 +285,6 @@ def plot_training_dynamics(
     axes[1].set(xlabel="Epoch", ylabel="Val. macro-F1 (%)", title="(b) Validation macro-F1")
     axes[2].set(xlabel="Epoch", ylabel="Val. AUROC (%)", title="(c) Validation AUROC")
     handles, labels_ = axes[1].get_legend_handles_labels()
-    fig.legend(handles, labels_, loc="lower center", ncol=min(6, len(labels_)), bbox_to_anchor=(0.5, -0.06))
-    fig.tight_layout(rect=(0, 0.08, 1, 1))
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.legend(handles, labels_, loc="lower center", ncol=min(6, len(labels_)), bbox_to_anchor=(0.5, 0.0))
     return save_figure(fig, out_dir, stem)

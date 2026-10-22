@@ -1,0 +1,21 @@
+\begin{table}[!t]
+\centering
+\caption{Per-class test performance (\%) of Att-ConvKAN (Ours). Best class per column in \textbf{bold}, second \underline{underlined}.}
+\label{tab:perclass}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{l r ccccc}
+\toprule
+Class & $n$ & Prec. & Rec./Sens. & F1 & Spec. & AUROC \\
+\midrule
+\texttt{akiec} & 66 & 50.00 & 60.61 & 54.79 & 97.94 & 95.24 \\
+\texttt{bcc} & 103 & 60.75 & 63.11 & 61.90 & 97.79 & 96.86 \\
+\texttt{bkl} & 220 & 57.74 & 62.73 & 60.13 & 94.34 & 91.44 \\
+\texttt{df} & 23 & 38.46 & 65.22 & 48.39 & \underline{98.79} & \textbf{99.03} \\
+\texttt{mel} & 223 & 55.93 & 44.39 & 49.50 & 95.62 & 87.15 \\
+\texttt{nv} & 1341 & \textbf{90.71} & \underline{89.56} & \textbf{90.13} & 81.48 & 93.98 \\
+\texttt{vasc} & 29 & \underline{66.67} & \textbf{89.66} & \underline{76.47} & \textbf{99.34} & \underline{97.34} \\
+\midrule
+Macro avg. & 2005 & 60.04 & 67.90 & 63.05 & 95.04 & 94.43 \\
+\bottomrule
+\end{tabular}
+\end{table}
