@@ -8,6 +8,7 @@ from .evaluator import (
     evaluate_predictions,
     expected_calibration_error,
     multiclass_auroc,
+    paired_bootstrap_delta,
     predict,
     specificity_per_class,
 )
@@ -23,6 +24,7 @@ __all__ = [
     "evaluate_predictions",
     "expected_calibration_error",
     "multiclass_auroc",
+    "paired_bootstrap_delta",
     "predict",
     "specificity_per_class",
     "EarlyStopping",

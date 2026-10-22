@@ -43,6 +43,7 @@ from src.engine import (  # noqa: E402
     evaluate_predictions,
     expected_calibration_error,
     fit_temperature,
+    paired_bootstrap_delta,
     predict,
     resolve_device,
 )
@@ -287,6 +288,25 @@ def build_summary(names: List[str], dirs: Dict[str, Path]) -> pd.DataFrame:
     return summary
 
 
+def write_paired_comparisons(names: List[str], dirs: Dict[str, Path], seed: int = 0) -> pd.DataFrame:
+    """Paired-bootstrap macro-F1 / balanced-accuracy differences: proposed minus every other model."""
+    ref = _load_predictions(dirs["metrics"] / f"{PROPOSED_MODEL}_test_predictions.csv")
+    rows = []
+    for name in names:
+        path = dirs["metrics"] / f"{name}_test_predictions.csv"
+        if name == PROPOSED_MODEL or not path.exists():
+            continue
+        other = _load_predictions(path)
+        if not np.array_equal(other["labels"], ref["labels"]):
+            raise ValueError(f"Test labels of {name} do not match the proposed model's")
+        res = paired_bootstrap_delta(ref["labels"], ref["probs"], other["probs"], seed=seed)
+        rows.append({"model": name, "display_name": MODEL_SPECS[name].display_name, **res})
+    df = pd.DataFrame(rows)
+    if len(df):
+        df.to_csv(dirs["metrics"] / "paired_bootstrap_vs_proposed.csv", index=False, float_format="%.4f")
+    return df
+
+
 def _select_xai_samples(labels: np.ndarray, probs: np.ndarray, class_names: List[str], n: int = 4) -> List[int]:
     """Highest-confidence correct predictions of diverse classes plus one error case."""
     preds = probs.argmax(1)
@@ -406,6 +426,8 @@ def aggregate(cfg: Dict[str, Any], bundle, loaders, device: torch.device, dirs: 
                 logger.info("profiling %s", name)
                 run_profiling(name, cfg, _load_model(name, cfg, bundle.num_classes, dirs, device), dirs, device, logger)
     summary = build_summary(names, dirs)
+    if not summary.empty and PROPOSED_MODEL in set(summary["model"]):
+        write_paired_comparisons(names, dirs, seed=int(cfg["experiment"].get("seed", 42)))
     if summary.empty:
         logger.warning("No finished experiments found; nothing to aggregate.")
         return summary

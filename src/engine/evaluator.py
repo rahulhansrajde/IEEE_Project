@@ -31,6 +31,7 @@ __all__ = [
     "specificity_per_class",
     "bootstrap_ci",
     "fit_temperature",
+    "paired_bootstrap_delta",
     "conformal_calibrate",
     "conformal_evaluate",
     "apply_temperature",
@@ -170,6 +171,45 @@ def fit_temperature(logits: np.ndarray, labels: np.ndarray, max_iter: int = 200)
 def apply_temperature(logits: np.ndarray, temperature: float) -> np.ndarray:
     z = torch.as_tensor(logits, dtype=torch.float64) / temperature
     return torch.softmax(z, dim=1).numpy()
+
+
+def paired_bootstrap_delta(
+    labels: np.ndarray,
+    probs_a: np.ndarray,
+    probs_b: np.ndarray,
+    n_bootstrap: int = 2000,
+    seed: int = 0,
+) -> Dict[str, float]:
+    """Paired bootstrap of the macro-F1 / balanced-accuracy difference ``A - B``.
+
+    Both models are evaluated on the *same* resampled test images, so the
+    interval accounts for the correlation between their errors. ``p_value`` is
+    the two-sided bootstrap p-value of the macro-F1 difference.
+    """
+    rng = np.random.default_rng(seed)
+    n, k = len(labels), probs_a.shape[1]
+    cls = np.arange(k)
+    pa, pb = probs_a.argmax(1), probs_b.argmax(1)
+    d_f1, d_bacc = [], []
+    for _ in range(n_bootstrap):
+        idx = rng.integers(0, n, n)
+        y = labels[idx]
+        d_f1.append(f1_score(y, pa[idx], average="macro", labels=cls, zero_division=0)
+                    - f1_score(y, pb[idx], average="macro", labels=cls, zero_division=0))
+        d_bacc.append(balanced_accuracy_score(y, pa[idx]) - balanced_accuracy_score(y, pb[idx]))
+    d_f1, d_bacc = np.asarray(d_f1), np.asarray(d_bacc)
+    observed = f1_score(labels, pa, average="macro", labels=cls, zero_division=0) - f1_score(
+        labels, pb, average="macro", labels=cls, zero_division=0)
+    p_value = min(1.0, 2 * min((d_f1 <= 0).mean(), (d_f1 >= 0).mean()))
+    return {
+        "delta_macro_f1": 100 * float(observed),
+        "delta_macro_f1_ci_lower": 100 * float(np.percentile(d_f1, 2.5)),
+        "delta_macro_f1_ci_upper": 100 * float(np.percentile(d_f1, 97.5)),
+        "delta_balanced_accuracy": 100 * float(balanced_accuracy_score(labels, pa) - balanced_accuracy_score(labels, pb)),
+        "delta_balanced_accuracy_ci_lower": 100 * float(np.percentile(d_bacc, 2.5)),
+        "delta_balanced_accuracy_ci_upper": 100 * float(np.percentile(d_bacc, 97.5)),
+        "p_value": float(p_value),
+    }
 
 
 def conformal_calibrate(cal_probs: np.ndarray, cal_labels: np.ndarray, alpha: float = 0.1) -> float:
