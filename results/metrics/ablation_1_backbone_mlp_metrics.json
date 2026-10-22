@@ -1,0 +1,169 @@
+{
+  "accuracy": 79.30174563591022,
+  "balanced_accuracy": 69.06741612888997,
+  "macro_f1": 64.66935680802585,
+  "weighted_f1": 78.96615586302038,
+  "macro_precision": 62.169385137680756,
+  "macro_recall": 69.06741612888997,
+  "macro_specificity": 94.88014917438551,
+  "auroc": 94.65496615354813,
+  "cohen_kappa": 0.6042432524086905,
+  "ece": 20.49647654975739,
+  "n_test": 2005,
+  "macro_f1_ci_lower": 60.72146797283242,
+  "macro_f1_ci_upper": 68.26010698125788,
+  "macro_f1_ci_std": 1.8932432607601068,
+  "accuracy_ci_lower": 77.55486284289277,
+  "accuracy_ci_upper": 81.14713216957607,
+  "accuracy_ci_std": 0.905157950157384,
+  "auroc_ci_lower": 93.88640208988738,
+  "auroc_ci_upper": 95.35599434394288,
+  "auroc_ci_std": 0.3765958307705346,
+  "conformal_alpha": 0.1,
+  "conformal_qhat": 0.7543724775314331,
+  "conformal_coverage": 90.77306733167082,
+  "conformal_set_size": 1.4508728179551122,
+  "per_class": [
+    {
+      "class": "akiec",
+      "precision": 43.01075268817204,
+      "recall": 60.60606060606061,
+      "f1": 50.314465408805034,
+      "specificity": 97.26663228468283,
+      "auroc": 96.21251191648304,
+      "support": 66
+    },
+    {
+      "class": "bcc",
+      "precision": 58.95522388059702,
+      "recall": 76.69902912621359,
+      "f1": 66.66666666666666,
+      "specificity": 97.10830704521555,
+      "auroc": 97.64121568507346,
+      "support": 103
+    },
+    {
+      "class": "bkl",
+      "precision": 61.5,
+      "recall": 55.90909090909091,
+      "f1": 58.57142857142858,
+      "specificity": 95.68627450980392,
+      "auroc": 90.32161955691367,
+      "support": 220
+    },
+    {
+      "class": "df",
+      "precision": 50.0,
+      "recall": 69.56521739130434,
+      "f1": 58.18181818181818,
+      "specificity": 99.19273461150352,
+      "auroc": 97.60014039398061,
+      "support": 23
+    },
+    {
+      "class": "mel",
+      "precision": 57.692307692307686,
+      "recall": 40.35874439461883,
+      "f1": 47.4934036939314,
+      "specificity": 96.29629629629629,
+      "auroc": 86.9107114996502,
+      "support": 223
+    },
+    {
+      "class": "nv",
+      "precision": 89.74169741697416,
+      "recall": 90.67859806114839,
+      "f1": 90.20771513353115,
+      "specificity": 79.06626506024097,
+      "auroc": 94.33483374212734,
+      "support": 1341
+    },
+    {
+      "class": "vasc",
+      "precision": 74.28571428571429,
+      "recall": 89.65517241379311,
+      "f1": 81.25,
+      "specificity": 99.54453441295547,
+      "auroc": 99.56373028060868,
+      "support": 29
+    }
+  ],
+  "confusion_matrix": [
+    [
+      40,
+      13,
+      7,
+      1,
+      4,
+      1,
+      0
+    ],
+    [
+      9,
+      79,
+      2,
+      4,
+      3,
+      5,
+      1
+    ],
+    [
+      23,
+      11,
+      123,
+      2,
+      17,
+      44,
+      0
+    ],
+    [
+      3,
+      1,
+      0,
+      16,
+      0,
+      3,
+      0
+    ],
+    [
+      8,
+      10,
+      23,
+      4,
+      90,
+      84,
+      4
+    ],
+    [
+      10,
+      20,
+      45,
+      4,
+      42,
+      1216,
+      4
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0,
+      2,
+      26
+    ]
+  ],
+  "model": "ablation_1_backbone_mlp",
+  "display_name": "Backbone + MLP head",
+  "family": "ablation",
+  "best_epoch": 9,
+  "epochs_run": 10,
+  "epochs_budget": 10,
+  "train_time_min": 11.076504679520925,
+  "best_val_macro_f1": 66.59726555534596,
+  "dataset": "dermamnist",
+  "image_size": 128,
+  "spline_regularization": false,
+  "lambda_l1": 0.0,
+  "lambda_ent": 0.0
+}

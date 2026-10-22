@@ -1,0 +1,174 @@
+{
+  "accuracy": 79.15211970074813,
+  "balanced_accuracy": 70.12416770196933,
+  "macro_f1": 65.56809927404218,
+  "weighted_f1": 79.6511191709052,
+  "macro_precision": 62.10368907237832,
+  "macro_recall": 70.12416770196933,
+  "macro_specificity": 95.41753069102734,
+  "auroc": 95.19174014980862,
+  "cohen_kappa": 0.6173353143312169,
+  "ece": 19.999267210686888,
+  "n_test": 2005,
+  "macro_f1_ci_lower": 61.63837949505567,
+  "macro_f1_ci_upper": 69.12100610134982,
+  "macro_f1_ci_std": 1.901201012967841,
+  "accuracy_ci_lower": 77.25561097256858,
+  "accuracy_ci_upper": 80.99750623441396,
+  "accuracy_ci_std": 0.9319108716902185,
+  "auroc_ci_lower": 94.40008272038108,
+  "auroc_ci_upper": 95.88246025973869,
+  "auroc_ci_std": 0.3800006718961598,
+  "conformal_alpha": 0.1,
+  "conformal_qhat": 0.7586206197738647,
+  "conformal_coverage": 90.92269326683292,
+  "conformal_set_size": 1.4384039900249377,
+  "per_class": [
+    {
+      "class": "akiec",
+      "precision": 44.827586206896555,
+      "recall": 59.09090909090909,
+      "f1": 50.98039215686274,
+      "specificity": 97.52449716348633,
+      "auroc": 95.64208354822073,
+      "support": 66
+    },
+    {
+      "class": "bcc",
+      "precision": 60.0,
+      "recall": 75.72815533980582,
+      "f1": 66.95278969957081,
+      "specificity": 97.26603575184016,
+      "auroc": 97.66010229395731,
+      "support": 103
+    },
+    {
+      "class": "bkl",
+      "precision": 60.76555023923444,
+      "recall": 57.72727272727273,
+      "f1": 59.20745920745921,
+      "specificity": 95.406162464986,
+      "auroc": 91.33511586452762,
+      "support": 220
+    },
+    {
+      "class": "df",
+      "precision": 48.38709677419355,
+      "recall": 65.21739130434783,
+      "f1": 55.55555555555556,
+      "specificity": 99.19273461150352,
+      "auroc": 98.22971965076998,
+      "support": 23
+    },
+    {
+      "class": "mel",
+      "precision": 51.88284518828452,
+      "recall": 55.60538116591929,
+      "f1": 53.67965367965368,
+      "specificity": 93.54657687991022,
+      "auroc": 89.03937229796722,
+      "support": 223
+    },
+    {
+      "class": "nv",
+      "precision": 92.3921568627451,
+      "recall": 87.8448918717375,
+      "f1": 90.06116207951071,
+      "specificity": 85.39156626506023,
+      "auroc": 94.53002165260594,
+      "support": 1341
+    },
+    {
+      "class": "vasc",
+      "precision": 76.47058823529412,
+      "recall": 89.65517241379311,
+      "f1": 82.53968253968253,
+      "specificity": 99.59514170040485,
+      "auroc": 99.90576574061147,
+      "support": 29
+    }
+  ],
+  "confusion_matrix": [
+    [
+      39,
+      14,
+      9,
+      0,
+      3,
+      1,
+      0
+    ],
+    [
+      9,
+      78,
+      4,
+      7,
+      2,
+      2,
+      1
+    ],
+    [
+      22,
+      11,
+      127,
+      3,
+      26,
+      31,
+      0
+    ],
+    [
+      2,
+      3,
+      0,
+      15,
+      0,
+      3,
+      0
+    ],
+    [
+      6,
+      6,
+      23,
+      2,
+      124,
+      59,
+      3
+    ],
+    [
+      9,
+      18,
+      46,
+      3,
+      83,
+      1178,
+      4
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      26
+    ]
+  ],
+  "model": "ablation_2_backbone_kan_no_att",
+  "display_name": "Backbone + KAN head",
+  "family": "ablation",
+  "best_epoch": 9,
+  "epochs_run": 10,
+  "epochs_budget": 10,
+  "train_time_min": 10.530786255995432,
+  "best_val_macro_f1": 64.98131142673901,
+  "dataset": "dermamnist",
+  "image_size": 128,
+  "spline_regularization": true,
+  "lambda_l1": 1.0,
+  "lambda_ent": 0.1,
+  "kan_head_edges": 37312.0,
+  "kan_edge_sparsity": 0.9997855917667239,
+  "kan_spline_entropy": 0.061021911810257734,
+  "kan_head_mean_l1": 0.0005143360904185101,
+  "kan_conv_mean_l1": 0.0
+}

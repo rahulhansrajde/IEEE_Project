@@ -1,0 +1,174 @@
+{
+  "accuracy": 79.00249376558604,
+  "balanced_accuracy": 67.89533454722087,
+  "macro_f1": 63.04557407128496,
+  "weighted_f1": 79.0307000546739,
+  "macro_precision": 60.036946804573674,
+  "macro_recall": 67.89533454722087,
+  "macro_specificity": 95.04294602703884,
+  "auroc": 94.43371362349842,
+  "cohen_kappa": 0.604479230948368,
+  "ece": 20.58513967770888,
+  "n_test": 2005,
+  "macro_f1_ci_lower": 59.48231845653966,
+  "macro_f1_ci_upper": 66.80597700628451,
+  "macro_f1_ci_std": 1.9144487793582556,
+  "accuracy_ci_lower": 77.2069825436409,
+  "accuracy_ci_upper": 80.74812967581047,
+  "accuracy_ci_std": 0.9204634794945573,
+  "auroc_ci_lower": 93.48618043323047,
+  "auroc_ci_upper": 95.25733747624064,
+  "auroc_ci_std": 0.44857399232675155,
+  "conformal_alpha": 0.1,
+  "conformal_qhat": 0.7681699395179749,
+  "conformal_coverage": 89.67581047381546,
+  "conformal_set_size": 1.4483790523690774,
+  "per_class": [
+    {
+      "class": "akiec",
+      "precision": 50.0,
+      "recall": 60.60606060606061,
+      "f1": 54.794520547945204,
+      "specificity": 97.93708096957194,
+      "auroc": 95.23653242064795,
+      "support": 66
+    },
+    {
+      "class": "bcc",
+      "precision": 60.747663551401864,
+      "recall": 63.10679611650486,
+      "f1": 61.904761904761905,
+      "specificity": 97.79179810725552,
+      "auroc": 96.8592079875042,
+      "support": 103
+    },
+    {
+      "class": "bkl",
+      "precision": 57.74058577405857,
+      "recall": 62.727272727272734,
+      "f1": 60.130718954248366,
+      "specificity": 94.34173669467786,
+      "auroc": 91.43799337916985,
+      "support": 220
+    },
+    {
+      "class": "df",
+      "precision": 38.46153846153847,
+      "recall": 65.21739130434783,
+      "f1": 48.38709677419355,
+      "specificity": 98.7891019172553,
+      "auroc": 99.03479138331944,
+      "support": 23
+    },
+    {
+      "class": "mel",
+      "precision": 55.932203389830505,
+      "recall": 44.39461883408072,
+      "f1": 49.5,
+      "specificity": 95.62289562289563,
+      "auroc": 87.15304515005559,
+      "support": 223
+    },
+    {
+      "class": "nv",
+      "precision": 90.70996978851964,
+      "recall": 89.56002982848621,
+      "f1": 90.1313320825516,
+      "specificity": 81.47590361445783,
+      "auroc": 93.97916048983406,
+      "support": 1341
+    },
+    {
+      "class": "vasc",
+      "precision": 66.66666666666666,
+      "recall": 89.65517241379311,
+      "f1": 76.47058823529412,
+      "specificity": 99.3421052631579,
+      "auroc": 97.33526455395783,
+      "support": 29
+    }
+  ],
+  "confusion_matrix": [
+    [
+      40,
+      13,
+      5,
+      3,
+      4,
+      1,
+      0
+    ],
+    [
+      8,
+      65,
+      4,
+      10,
+      7,
+      6,
+      3
+    ],
+    [
+      15,
+      8,
+      138,
+      1,
+      20,
+      37,
+      1
+    ],
+    [
+      4,
+      2,
+      1,
+      15,
+      0,
+      1,
+      0
+    ],
+    [
+      8,
+      4,
+      29,
+      5,
+      99,
+      77,
+      1
+    ],
+    [
+      5,
+      15,
+      61,
+      5,
+      46,
+      1201,
+      8
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      26
+    ]
+  ],
+  "model": "att_convkan_proposed",
+  "display_name": "Att-ConvKAN (Ours)",
+  "family": "proposed",
+  "best_epoch": 8,
+  "epochs_run": 10,
+  "epochs_budget": 10,
+  "train_time_min": 32.41379676659902,
+  "best_val_macro_f1": 62.94576694144288,
+  "dataset": "dermamnist",
+  "image_size": 128,
+  "spline_regularization": true,
+  "lambda_l1": 1.0,
+  "lambda_ent": 0.1,
+  "kan_head_edges": 37312.0,
+  "kan_edge_sparsity": 0.9999463979416809,
+  "kan_spline_entropy": 0.0005754955345764756,
+  "kan_head_mean_l1": 0.0004991068126400933,
+  "kan_conv_mean_l1": 0.0008897456573322415
+}
