@@ -1,0 +1,112 @@
+[10/22/26 04:08:34] INFO     config=configs/quick_benchmark.yaml device=cpu     
+                             threads=2                                          
+[10/22/26 04:09:08] INFO     dataset=dermamnist classes=['akiec', 'bcc', 'bkl', 
+                             'df', 'mel', 'nv', 'vasc'] train=7007 val=1003     
+                             test=2005 counts=[228, 359, 769, 80, 779, 4693, 99]
+                    INFO     === Full w/o spline reg.                           
+                             (ablation_4_full_no_spline_reg) ===                
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[10/22/26 04:13:12] INFO       epoch 01/10  train_loss=0.3193  val_loss=0.3328  
+                             val_acc=0.6909  val_f1=0.3289  val_auc=0.8566      
+                             (236.5s)  *best*                                   
+[10/22/26 04:16:51] INFO       epoch 02/10  train_loss=0.2569  val_loss=0.2601  
+                             val_acc=0.5852  val_f1=0.3847  val_auc=0.8681      
+                             (218.3s)  *best*                                   
+[10/22/26 04:16:58] INFO       epoch 3: updated B-spline grids of 2 KANLinear   
+                             layers                                             
+[10/22/26 04:20:26] INFO       epoch 03/10  train_loss=0.2319  val_loss=0.2411  
+                             val_acc=0.7438  val_f1=0.5184  val_auc=0.9103      
+                             (208.4s)  *best*                                   
+[10/22/26 04:23:58] INFO       epoch 04/10  train_loss=0.2053  val_loss=0.2175  
+                             val_acc=0.7428  val_f1=0.4885  val_auc=0.9135      
+                             (211.9s)                                           
+[10/22/26 04:27:22] INFO       epoch 05/10  train_loss=0.1897  val_loss=0.1852  
+                             val_acc=0.7697  val_f1=0.5729  val_auc=0.9242      
+                             (203.6s)  *best*                                   
+[10/22/26 04:30:44] INFO       epoch 06/10  train_loss=0.1729  val_loss=0.1874  
+                             val_acc=0.7428  val_f1=0.5562  val_auc=0.9287      
+                             (201.8s)                                           
+[10/22/26 04:34:02] INFO       epoch 07/10  train_loss=0.1604  val_loss=0.1691  
+                             val_acc=0.7827  val_f1=0.6109  val_auc=0.9360      
+                             (198.3s)  *best*                                   
+[10/22/26 04:37:23] INFO       epoch 08/10  train_loss=0.1460  val_loss=0.1562  
+                             val_acc=0.8036  val_f1=0.6567  val_auc=0.9451      
+                             (200.7s)  *best*                                   
+[10/22/26 04:40:45] INFO       epoch 09/10  train_loss=0.1404  val_loss=0.1608  
+                             val_acc=0.7986  val_f1=0.6892  val_auc=0.9452      
+                             (202.9s)  *best*                                   
+[10/22/26 04:44:07] INFO       epoch 10/10  train_loss=0.1344  val_loss=0.1574  
+                             val_acc=0.8036  val_f1=0.6842  val_auc=0.9465      
+                             (201.9s)                                           
+[10/22/26 04:45:00] INFO       test: acc=78.30  bacc=71.65  macro-F1=66.23      
+                             [62.44, 69.53]  AUROC=94.97  ECE=19.06             
+                    INFO       ablation_4_full_no_spline_reg finished in 35.9   
+                             min                                                
+                    INFO     === MobileNetV3-S (mobilenetv3_small) ===          
+[10/22/26 04:46:35] INFO       epoch 01/10  train_loss=0.8757  val_loss=0.8572  
+                             val_acc=0.6411  val_f1=0.2740  val_auc=0.8325      
+                             (94.3s)  *best*                                    
+[10/22/26 04:48:08] INFO       epoch 02/10  train_loss=0.3875  val_loss=0.4994  
+                             val_acc=0.5464  val_f1=0.3636  val_auc=0.8342      
+                             (92.4s)  *best*                                    
+[10/22/26 04:49:20] INFO       epoch 03/10  train_loss=0.3226  val_loss=0.2950  
+                             val_acc=0.5284  val_f1=0.3999  val_auc=0.8783      
+                             (72.5s)  *best*                                    
+[10/22/26 04:50:35] INFO       epoch 04/10  train_loss=0.2632  val_loss=0.3141  
+                             val_acc=0.6251  val_f1=0.4006  val_auc=0.8891      
+                             (74.5s)  *best*                                    
+[10/22/26 04:51:49] INFO       epoch 05/10  train_loss=0.2312  val_loss=0.2322  
+                             val_acc=0.6510  val_f1=0.5038  val_auc=0.9146      
+                             (73.9s)  *best*                                    
+[10/22/26 04:53:05] INFO       epoch 06/10  train_loss=0.2135  val_loss=0.2260  
+                             val_acc=0.6660  val_f1=0.5162  val_auc=0.9205      
+                             (76.4s)  *best*                                    
+[10/22/26 04:54:23] INFO       epoch 07/10  train_loss=0.1841  val_loss=0.1916  
+                             val_acc=0.7248  val_f1=0.5725  val_auc=0.9214      
+                             (77.6s)  *best*                                    
+[10/22/26 04:55:36] INFO       epoch 08/10  train_loss=0.1653  val_loss=0.1800  
+                             val_acc=0.7817  val_f1=0.6100  val_auc=0.9366      
+                             (73.1s)  *best*                                    
+[10/22/26 04:56:50] INFO       epoch 09/10  train_loss=0.1541  val_loss=0.1768  
+                             val_acc=0.7777  val_f1=0.6259  val_auc=0.9393      
+                             (73.7s)  *best*                                    
+[10/22/26 04:58:07] INFO       epoch 10/10  train_loss=0.1501  val_loss=0.1754  
+                             val_acc=0.7886  val_f1=0.6501  val_auc=0.9395      
+                             (76.9s)  *best*                                    
+[10/22/26 04:58:33] INFO       test: acc=77.46  bacc=67.70  macro-F1=62.27      
+                             [58.55, 65.64]  AUROC=94.05  ECE=18.19             
+                    INFO       mobilenetv3_small finished in 13.5 min           
+                    INFO     === ConvNeXt-T (convnext_tiny) ===                 
+[10/22/26 05:06:32] INFO       epoch 01/10  train_loss=0.3256  val_loss=0.2959  
+                             val_acc=0.6909  val_f1=0.3595  val_auc=0.8358      
+                             (474.0s)  *best*                                   
+[10/22/26 05:14:09] INFO       epoch 02/10  train_loss=0.3011  val_loss=0.2243  
+                             val_acc=0.7168  val_f1=0.3839  val_auc=0.9094      
+                             (457.0s)  *best*                                   
+[10/22/26 05:22:42] INFO       epoch 03/10  train_loss=0.2474  val_loss=0.2077  
+                             val_acc=0.7448  val_f1=0.5468  val_auc=0.9300      
+                             (512.3s)  *best*                                   
+[10/22/26 05:33:11] INFO       epoch 04/10  train_loss=0.2262  val_loss=0.2042  
+                             val_acc=0.7866  val_f1=0.6324  val_auc=0.9340      
+                             (628.4s)  *best*                                   
+[10/22/26 05:41:07] INFO       epoch 05/10  train_loss=0.1920  val_loss=0.1634  
+                             val_acc=0.8106  val_f1=0.6370  val_auc=0.9481      
+                             (476.6s)  *best*                                   
+[10/22/26 05:48:56] INFO       epoch 06/10  train_loss=0.1623  val_loss=0.1850  
+                             val_acc=0.7787  val_f1=0.6200  val_auc=0.9472      
+                             (468.3s)                                           
+[10/22/26 05:56:50] INFO       epoch 07/10  train_loss=0.1528  val_loss=0.1615  
+                             val_acc=0.7647  val_f1=0.6342  val_auc=0.9487      
+                             (474.3s)                                           
+[10/22/26 06:04:43] INFO       epoch 08/10  train_loss=0.1247  val_loss=0.1405  
+                             val_acc=0.8106  val_f1=0.6786  val_auc=0.9610      
+                             (472.3s)  *best*                                   
+[10/22/26 06:12:54] INFO       epoch 09/10  train_loss=0.1161  val_loss=0.1379  
+                             val_acc=0.8146  val_f1=0.6966  val_auc=0.9621      
+                             (491.1s)  *best*                                   
+[10/22/26 06:21:00] INFO       epoch 10/10  train_loss=0.1098  val_loss=0.1373  
+                             val_acc=0.8156  val_f1=0.7023  val_auc=0.9626      
+                             (486.0s)  *best*                                   
+[10/22/26 06:22:15] INFO       test: acc=82.49  bacc=76.16  macro-F1=72.35      
+                             [68.57, 75.63]  AUROC=96.41  ECE=20.35             
+                    INFO       convnext_tiny finished in 83.7 min               

@@ -1,0 +1,46 @@
+[10/22/26 07:57:59] INFO     config=configs/quick_benchmark.yaml device=cpu     
+                             threads=4                                          
+[10/22/26 07:58:09] INFO     dataset=dermamnist classes=['akiec', 'bcc', 'bkl', 
+                             'df', 'mel', 'nv', 'vasc'] train=7007 val=1003     
+                             test=2005 counts=[228, 359, 769, 80, 779, 4693, 99]
+[10/22/26 08:00:41] INFO     LaTeX tables written to                            
+                             /home/user/IEEE_Project/results/tables             
+[10/22/26 08:00:52] INFO       fig1 written (test indices [1450, 1736, 1359,    
+                             1247])                                             
+[10/22/26 08:01:09] INFO       fig2 written                                     
+[10/22/26 08:01:17] INFO     Figures written to                                 
+                             /home/user/IEEE_Project/results/figures            
+                    INFO                                                        
+                                           display_name  accuracy               
+                             balanced_accuracy  macro_f1  auroc    ece  params_m
+                             head_params_k  gflops  latency_ms                  
+                                     Att-ConvKAN (Ours)    79.002               
+                             67.895    63.046 94.434 20.585     1.587           
+                             374.400   0.048      16.088                        
+                                              ResNet-50    82.244               
+                             74.998    71.963 95.626 18.959    23.522           
+                             14.343   2.669      48.000                         
+                                           DenseNet-121    84.539               
+                             76.307    75.161 96.799 17.700     6.961           
+                             7.175   1.850      62.980                          
+                                          MobileNetV3-S    77.456               
+                             67.696    62.266 94.048 18.190     1.525           
+                             598.023   0.038       9.003                        
+                                               ViT-Tiny    83.092               
+                             79.266    74.434 96.548 21.312     5.500           
+                             1.351   0.709      14.767                          
+                                             ConvNeXt-T    82.494               
+                             76.157    72.345 96.408 20.349    27.826           
+                             6.919   2.909      52.109                          
+                                    Backbone + MLP head    79.302               
+                             69.067    64.669 94.655 20.496     1.526           
+                             599.175   0.038      10.515                        
+                                    Backbone + KAN head    79.152               
+                             70.124    65.568 95.192 19.999     1.301           
+                             374.400   0.037      11.163                        
+                             Backbone + Att. + MLP head    78.155               
+                             70.897    62.872 94.727 17.726     1.631           
+                             599.175   0.038       9.978                        
+                                   Full w/o spline reg.    78.304               
+                             71.653    66.230 94.975 19.060     1.587           
+                             374.400   0.048      21.510                        

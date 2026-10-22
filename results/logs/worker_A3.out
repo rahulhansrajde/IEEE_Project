@@ -1,0 +1,39 @@
+[10/22/26 05:18:48] INFO     config=configs/quick_benchmark.yaml device=cpu     
+                             threads=2                                          
+[10/22/26 05:18:56] INFO     dataset=dermamnist classes=['akiec', 'bcc', 'bkl', 
+                             'df', 'mel', 'nv', 'vasc'] train=7007 val=1003     
+                             test=2005 counts=[228, 359, 769, 80, 779, 4693, 99]
+                    INFO     === ViT-Tiny (vit_tiny) ===                        
+[10/22/26 05:21:49] INFO       epoch 01/10  train_loss=0.3430  val_loss=0.2658  
+                             val_acc=0.7308  val_f1=0.3681  val_auc=0.9207      
+                             (170.1s)  *best*                                   
+[10/22/26 05:26:09] INFO       epoch 02/10  train_loss=0.2417  val_loss=0.2280  
+                             val_acc=0.7188  val_f1=0.4637  val_auc=0.9101      
+                             (260.6s)  *best*                                   
+[10/22/26 05:29:22] INFO       epoch 03/10  train_loss=0.2125  val_loss=0.1773  
+                             val_acc=0.7667  val_f1=0.5839  val_auc=0.9373      
+                             (192.7s)  *best*                                   
+[10/22/26 05:31:58] INFO       epoch 04/10  train_loss=0.1874  val_loss=0.2153  
+                             val_acc=0.6899  val_f1=0.5213  val_auc=0.9318      
+                             (155.5s)                                           
+[10/22/26 05:34:11] INFO       epoch 05/10  train_loss=0.1771  val_loss=0.1733  
+                             val_acc=0.6999  val_f1=0.5649  val_auc=0.9419      
+                             (133.4s)                                           
+[10/22/26 05:36:23] INFO       epoch 06/10  train_loss=0.1590  val_loss=0.1696  
+                             val_acc=0.7956  val_f1=0.6631  val_auc=0.9569      
+                             (131.9s)  *best*                                   
+[10/22/26 05:38:43] INFO       epoch 07/10  train_loss=0.1415  val_loss=0.1484  
+                             val_acc=0.7966  val_f1=0.6683  val_auc=0.9590      
+                             (139.7s)  *best*                                   
+[10/22/26 05:41:02] INFO       epoch 08/10  train_loss=0.1262  val_loss=0.1387  
+                             val_acc=0.8016  val_f1=0.6820  val_auc=0.9625      
+                             (139.3s)  *best*                                   
+[10/22/26 05:43:18] INFO       epoch 09/10  train_loss=0.1170  val_loss=0.1349  
+                             val_acc=0.8175  val_f1=0.7115  val_auc=0.9645      
+                             (136.2s)  *best*                                   
+[10/22/26 05:45:33] INFO       epoch 10/10  train_loss=0.1121  val_loss=0.1354  
+                             val_acc=0.8166  val_f1=0.7064  val_auc=0.9648      
+                             (134.7s)                                           
+[10/22/26 05:46:09] INFO       test: acc=83.09  bacc=79.27  macro-F1=74.43      
+                             [71.08, 77.50]  AUROC=96.55  ECE=21.31             
+                    INFO       vit_tiny finished in 27.2 min                    

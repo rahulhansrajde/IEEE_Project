@@ -1,0 +1,7 @@
+[10/22/26 06:22:30] INFO     config=configs/quick_benchmark.yaml device=cpu     
+                             threads=4                                          
+[10/22/26 06:22:37] INFO     dataset=dermamnist classes=['akiec', 'bcc', 'bkl', 
+                             'df', 'mel', 'nv', 'vasc'] train=7007 val=1003     
+                             test=2005 counts=[228, 359, 769, 80, 779, 4693, 99]
+                    INFO     === DenseNet-121 (densenet121) ===                 
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.

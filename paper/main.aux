@@ -1,0 +1,117 @@
+\relax 
+\citation{esteva2017dermatologist,codella2019isic}
+\citation{he2016resnet}
+\citation{huang2017densenet}
+\citation{liu2022convnext}
+\citation{dosovitskiy2021vit}
+\citation{selvaraju2017gradcam,chattopadhay2018gradcampp}
+\citation{tschandl2018ham10000}
+\citation{liu2025kan,liu2024kan2}
+\citation{kolmogorov1957}
+\citation{deboor1978splines}
+\citation{bodner2024convkan,drokin2024kanconv}
+\citation{yang2025kat}
+\citation{li2024fastkan,bozorgasl2024wavkan}
+\citation{li2025ukan}
+\citation{woo2018cbam,hou2021coordatt}
+\citation{lin2017focal,cui2019classbalanced}
+\citation{yang2023medmnist}
+\citation{guo2017calibration}
+\citation{angelopoulos2021gentle}
+\citation{he2016resnet}
+\citation{huang2017densenet}
+\citation{codella2019isic}
+\citation{howard2019mobilenetv3}
+\citation{dosovitskiy2021vit}
+\citation{liu2022convnext}
+\citation{yang2023medmnist}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
+\citation{hu2018senet}
+\citation{woo2018cbam}
+\citation{hou2021coordatt}
+\citation{liu2025kan}
+\citation{liu2024kan2}
+\citation{li2024fastkan}
+\citation{bozorgasl2024wavkan}
+\citation{bodner2024convkan,drokin2024kanconv}
+\citation{yang2025kat}
+\citation{li2025ukan}
+\citation{deboor1978splines}
+\citation{liu2025kan}
+\citation{cui2019classbalanced}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Overview of Att-ConvKAN. KAN components are typeset in \texttt  {monospace}.}}{2}{}\protected@file@percent }
+\newlabel{fig:arch}{{1}{2}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Proposed Methodology}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}B-spline KAN layers}{2}{}\protected@file@percent }
+\newlabel{eq:kan}{{1}{2}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}KANConv2d and the KANConv bottleneck}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Coordinate-channel attention}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Composite focal-spline loss}{2}{}\protected@file@percent }
+\citation{yang2023medmnist}
+\citation{tschandl2018ham10000}
+\citation{howard2019mobilenetv3}
+\citation{loshchilov2017sgdr,loshchilov2019adamw}
+\citation{zhang2018mixup,yun2019cutmix}
+\citation{guo2017calibration}
+\citation{angelopoulos2021gentle}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Setup}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Results and Ablation Analysis}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Comparison with baselines}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Ablation study}{3}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Comparison with state-of-the-art baselines. DermaMNIST (HAM10000) test set ($n=2005$), $128\times 128$ inputs, 10-epoch budget. Latency: batch size 1 on CPU. Macro-F1 is reported with its 95\% bootstrap confidence interval. Best value per column in \textbf  {bold}, second best \underline  {underlined}; $\uparrow $/$\downarrow $: higher/lower is better.}}{4}{}\protected@file@percent }
+\newlabel{tab:baselines}{{I}{4}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Accuracy--efficiency trade-off on the DermaMNIST test set. Bubble area is proportional to GFLOPs; the dashed line connects Pareto-optimal models (higher macro-F1 at lower cost).}}{4}{}\protected@file@percent }
+\newlabel{fig:pareto}{{2}{4}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Ablation study of the Att-ConvKAN components (same backbone, data, budget and seed). $\Delta $F1: macro-F1 change w.r.t.\ the backbone + MLP-head reference (row 1). Symb.: share of KAN-head edges whose spline term is $<1\%$ of their SiLU weight, i.e.\ edges that reduce to the symbolic form $w_b\,\mathrm  {SiLU}(x)$; $H$: normalised entropy of the spline edge importances (lower = more concentrated).}}{4}{}\protected@file@percent }
+\newlabel{tab:ablation}{{II}{4}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Per-class test performance (\%) of Att-ConvKAN (Ours). Best class per column in \textbf  {bold}, second \underline  {underlined}.}}{4}{}\protected@file@percent }
+\newlabel{tab:perclass}{{III}{4}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Per-class behaviour and calibration}{4}{}\protected@file@percent }
+\bibcite{esteva2017dermatologist}{1}
+\bibcite{codella2019isic}{2}
+\bibcite{tschandl2018ham10000}{3}
+\bibcite{yang2023medmnist}{4}
+\bibcite{liu2025kan}{5}
+\bibcite{liu2024kan2}{6}
+\bibcite{kolmogorov1957}{7}
+\bibcite{deboor1978splines}{8}
+\bibcite{bodner2024convkan}{9}
+\bibcite{drokin2024kanconv}{10}
+\bibcite{yang2025kat}{11}
+\bibcite{li2025ukan}{12}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Explainability Analysis}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Limitations}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
+\bibcite{li2024fastkan}{13}
+\bibcite{bozorgasl2024wavkan}{14}
+\bibcite{he2016resnet}{15}
+\bibcite{huang2017densenet}{16}
+\bibcite{howard2019mobilenetv3}{17}
+\bibcite{dosovitskiy2021vit}{18}
+\bibcite{liu2022convnext}{19}
+\bibcite{hu2018senet}{20}
+\bibcite{woo2018cbam}{21}
+\bibcite{hou2021coordatt}{22}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Per-class and macro-average ROC (left) and precision-recall (right) curves of Att-ConvKAN\ on the test set; AUC and average precision in the legends.}}{6}{}\protected@file@percent }
+\newlabel{fig:roc}{{3}{6}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Row-normalised confusion matrices of Att-ConvKAN\ and the best baseline (DenseNet-121) on the test set.}}{6}{}\protected@file@percent }
+\newlabel{fig:cm}{{4}{6}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Training dynamics: training (dashed) and validation (solid) loss, validation macro-F1 and validation AUROC per epoch.}}{6}{}\protected@file@percent }
+\newlabel{fig:dynamics}{{5}{6}{}{}{}}
+\bibcite{lin2017focal}{23}
+\bibcite{cui2019classbalanced}{24}
+\bibcite{selvaraju2017gradcam}{25}
+\bibcite{chattopadhay2018gradcampp}{26}
+\bibcite{guo2017calibration}{27}
+\bibcite{angelopoulos2021gentle}{28}
+\bibcite{loshchilov2017sgdr}{29}
+\bibcite{loshchilov2019adamw}{30}
+\bibcite{zhang2018mixup}{31}
+\bibcite{yun2019cutmix}{32}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Qualitative explanations on four test images (three confident correct predictions of different classes and the most confident misclassified non-nevus lesion). For each image: input with ground truth (GT) and prediction of Att-ConvKAN; its coordinate-channel attention; its Grad-CAM++; Grad-CAM++ of the best baseline.}}{7}{}\protected@file@percent }
+\newlabel{fig:gradcam}{{6}{7}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Learned edge functions $\phi _{c,i}(x)$ of the output \texttt  {KANLinear} layer of Att-ConvKAN\ (top-12 edges by spline importance; subscripts give the target class and the input unit). Solid: total activation; dashed: SiLU residual; dotted: B-spline component; ticks: adapted knots; $\overline  {|c|}$: mean absolute spline coefficient.}}{7}{}\protected@file@percent }
+\newlabel{fig:splines}{{7}{7}{}{}{}}
+\gdef \@abspage@last{7}

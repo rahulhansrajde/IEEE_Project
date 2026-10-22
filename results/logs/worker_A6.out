@@ -1,0 +1,40 @@
+[10/22/26 06:33:36] INFO     config=configs/quick_benchmark.yaml device=cpu     
+                             threads=4                                          
+[10/22/26 06:33:43] INFO     dataset=dermamnist classes=['akiec', 'bcc', 'bkl', 
+                             'df', 'mel', 'nv', 'vasc'] train=7007 val=1003     
+                             test=2005 counts=[228, 359, 769, 80, 779, 4693, 99]
+                    INFO     === DenseNet-121 (densenet121) ===                 
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[10/22/26 06:40:19] INFO       epoch 01/10  train_loss=0.3360  val_loss=0.2445  
+                             val_acc=0.6520  val_f1=0.4162  val_auc=0.9122      
+                             (395.8s)  *best*                                   
+[10/22/26 06:47:25] INFO       epoch 02/10  train_loss=0.2204  val_loss=0.1984  
+                             val_acc=0.7378  val_f1=0.5913  val_auc=0.9298      
+                             (425.6s)  *best*                                   
+[10/22/26 06:53:41] INFO       epoch 03/10  train_loss=0.1747  val_loss=0.1749  
+                             val_acc=0.7727  val_f1=0.6037  val_auc=0.9387      
+                             (375.9s)  *best*                                   
+[10/22/26 07:00:01] INFO       epoch 04/10  train_loss=0.1488  val_loss=0.1662  
+                             val_acc=0.7866  val_f1=0.6376  val_auc=0.9472      
+                             (380.0s)  *best*                                   
+[10/22/26 07:07:25] INFO       epoch 05/10  train_loss=0.1327  val_loss=0.1582  
+                             val_acc=0.8026  val_f1=0.6797  val_auc=0.9502      
+                             (443.7s)  *best*                                   
+[10/22/26 07:14:35] INFO       epoch 06/10  train_loss=0.1200  val_loss=0.1537  
+                             val_acc=0.8086  val_f1=0.7076  val_auc=0.9499      
+                             (430.1s)  *best*                                   
+[10/22/26 07:21:39] INFO       epoch 07/10  train_loss=0.1071  val_loss=0.1387  
+                             val_acc=0.8295  val_f1=0.7417  val_auc=0.9602      
+                             (423.9s)  *best*                                   
+[10/22/26 07:28:44] INFO       epoch 08/10  train_loss=0.0968  val_loss=0.1392  
+                             val_acc=0.8365  val_f1=0.7433  val_auc=0.9626      
+                             (424.5s)  *best*                                   
+[10/22/26 07:36:13] INFO       epoch 09/10  train_loss=0.0913  val_loss=0.1397  
+                             val_acc=0.8395  val_f1=0.7509  val_auc=0.9607      
+                             (448.9s)  *best*                                   
+[10/22/26 07:43:41] INFO       epoch 10/10  train_loss=0.0907  val_loss=0.1411  
+                             val_acc=0.8305  val_f1=0.7466  val_auc=0.9595      
+                             (447.7s)                                           
+[10/22/26 07:45:05] INFO       test: acc=84.54  bacc=76.31  macro-F1=75.16      
+                             [71.45, 78.51]  AUROC=96.80  ECE=17.70             
+                    INFO       densenet121 finished in 71.4 min                 

@@ -121,8 +121,46 @@ python scripts/inference_demo.py --sample-index 0
 python scripts/inference_demo.py --image my_lesion.jpg
 ```
 
-Finished models are skipped on re-runs (use `--force` to retrain). Checkpoints are written to `checkpoints/`
-(git-ignored); metrics, predictions, histories, figures (300-DPI PNG + PDF) and tables go to `results/`.
+Finished models are skipped on re-runs (use `--force` to retrain). Checkpoints are written to `checkpoints/`;
+metrics, predictions, histories, figures (300-DPI PNG + PDF) and tables go to `results/`.
+
+## Trained models and data in this repository (Git LFS)
+
+Everything produced by the run above is committed, nothing is git-ignored:
+
+| Path | Content |
+|---|---|
+| `checkpoints/<model>_best.pt` | best-validation weights of all 10 trained models (`{"model_state", "epoch", "metrics", "model_name"}`) |
+| `checkpoints/att_convkan_proposed_test_embeddings.npy` | penultimate test embeddings of Att-ConvKAN (used for the t-SNE figure) |
+| `data/dermamnist_128.npz`, `data/dermamnist_64.npz` | the MedMNIST+ DermaMNIST files used for training / tests |
+| `results/logs/` | full training, worker and aggregation logs |
+
+The `*.pt`, `*.npz` and `*.npy` files are stored with **Git LFS** (they exceed GitHub's 100 MB file limit or are large
+binaries). After cloning run
+
+```bash
+git lfs install
+git lfs pull
+```
+
+Loading a trained model:
+
+```python
+import torch
+from src.models import build_model
+
+model = build_model("att_convkan_proposed", num_classes=7, pretrained=False, image_size=128)
+ckpt = torch.load("checkpoints/att_convkan_proposed_best.pt", map_location="cpu", weights_only=False)
+model.load_state_dict(ckpt["model_state"])
+model.eval()
+```
+
+With the checkpoints present, `python scripts/run_all_experiments.py --aggregate-only` regenerates every figure and
+table without retraining, and `scripts/inference_demo.py` works out of the box.
+
+**Data licence.** DermaMNIST is part of MedMNIST (Yang et al., *Scientific Data* 2023, CC BY 4.0) and is derived from
+HAM10000 (Tschandl et al., *Scientific Data* 2018), which is released under **CC BY-NC 4.0** (non-commercial use, with
+attribution). The copies in `data/` are redistributed unmodified under those terms; please cite both papers.
 
 ## Building the paper
 

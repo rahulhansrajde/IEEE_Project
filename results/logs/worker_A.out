@@ -1,0 +1,40 @@
+[10/22/26 02:40:49] INFO     config=configs/quick_benchmark.yaml device=cpu     
+                             threads=2                                          
+[10/22/26 02:40:57] INFO     dataset=dermamnist classes=['akiec', 'bcc', 'bkl', 
+                             'df', 'mel', 'nv', 'vasc'] train=7007 val=1003     
+                             test=2005 counts=[228, 359, 769, 80, 779, 4693, 99]
+                    INFO     === ResNet-50 (resnet50) ===                       
+[10/22/26 02:49:51] INFO       epoch 01/10  train_loss=0.3558  val_loss=0.2725  
+                             val_acc=0.6510  val_f1=0.3726  val_auc=0.8739      
+                             (530.1s)  *best*                                   
+[10/22/26 02:58:00] INFO       epoch 02/10  train_loss=0.2242  val_loss=0.2191  
+                             val_acc=0.7258  val_f1=0.5170  val_auc=0.8989      
+                             (489.7s)  *best*                                   
+[10/22/26 03:05:59] INFO       epoch 03/10  train_loss=0.1850  val_loss=0.1795  
+                             val_acc=0.7827  val_f1=0.5875  val_auc=0.9403      
+                             (478.9s)  *best*                                   
+[10/22/26 03:14:10] INFO       epoch 04/10  train_loss=0.1620  val_loss=0.1794  
+                             val_acc=0.7787  val_f1=0.5989  val_auc=0.9290      
+                             (490.5s)  *best*                                   
+[10/22/26 03:23:02] INFO       epoch 05/10  train_loss=0.1455  val_loss=0.1581  
+                             val_acc=0.8086  val_f1=0.6769  val_auc=0.9531      
+                             (531.5s)  *best*                                   
+[10/22/26 03:31:13] INFO       epoch 06/10  train_loss=0.1326  val_loss=0.1476  
+                             val_acc=0.8175  val_f1=0.6901  val_auc=0.9543      
+                             (490.6s)  *best*                                   
+[10/22/26 03:39:19] INFO       epoch 07/10  train_loss=0.1225  val_loss=0.1423  
+                             val_acc=0.8146  val_f1=0.7066  val_auc=0.9591      
+                             (486.6s)  *best*                                   
+[10/22/26 03:47:36] INFO       epoch 08/10  train_loss=0.1151  val_loss=0.1446  
+                             val_acc=0.8175  val_f1=0.7096  val_auc=0.9580      
+                             (496.8s)  *best*                                   
+[10/22/26 03:55:27] INFO       epoch 09/10  train_loss=0.1129  val_loss=0.1424  
+                             val_acc=0.8265  val_f1=0.7184  val_auc=0.9587      
+                             (470.0s)  *best*                                   
+[10/22/26 04:02:51] INFO       epoch 10/10  train_loss=0.1119  val_loss=0.1428  
+                             val_acc=0.8146  val_f1=0.7065  val_auc=0.9582      
+                             (444.4s)                                           
+[10/22/26 04:04:05] INFO       test: acc=82.24  bacc=75.00  macro-F1=71.96      
+                             [68.37, 75.21]  AUROC=95.63  ECE=18.96             
+                    INFO       resnet50 finished in 83.1 min                    
+                    INFO     === DenseNet-121 (densenet121) ===                 
